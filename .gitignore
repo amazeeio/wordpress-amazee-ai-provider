@@ -1,0 +1,7 @@
+/vendor/
+.DS_Store
+/GEMINI.md
+/LEARNINGS.gemini.md
+/docs/
+/plans/
+/.phpunit.cache/
