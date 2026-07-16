@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Global variable storage for mock options.
 $GLOBALS['wp_mock_options'] = array();
 $GLOBALS['wp_mock_constants'] = array();
+$GLOBALS['wp_mock_transients'] = array();
 
 // Mock WordPress functions.
 if ( ! function_exists( 'get_option' ) ) {
@@ -61,6 +62,26 @@ if ( ! function_exists( '__' ) ) {
 if ( ! function_exists( 'plugin_dir_path' ) ) {
 	function plugin_dir_path( $file ) {
 		return dirname( $file ) . '/';
+	}
+}
+
+if ( ! function_exists( 'get_transient' ) ) {
+	function get_transient( $transient ) {
+		return $GLOBALS['wp_mock_transients'][ $transient ] ?? false;
+	}
+}
+
+if ( ! function_exists( 'set_transient' ) ) {
+	function set_transient( $transient, $value, $expiration = 0 ) {
+		$GLOBALS['wp_mock_transients'][ $transient ] = $value;
+		return true;
+	}
+}
+
+if ( ! function_exists( 'delete_transient' ) ) {
+	function delete_transient( $transient ) {
+		unset( $GLOBALS['wp_mock_transients'][ $transient ] );
+		return true;
 	}
 }
 

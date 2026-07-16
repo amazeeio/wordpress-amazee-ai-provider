@@ -11,6 +11,8 @@ namespace Amazee\AiProvider;
 
 use WordPress\AiClient\Common\Exception\RuntimeException;
 use WordPress\AiClient\Providers\ApiBasedImplementation\AbstractApiProvider;
+use WordPress\AiClient\Providers\Http\Contracts\RequestAuthenticationInterface;
+use WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication;
 use WordPress\AiClient\Providers\ApiBasedImplementation\ListModelsApiBasedProviderAvailability;
 use WordPress\AiClient\Providers\Contracts\ModelMetadataDirectoryInterface;
 use WordPress\AiClient\Providers\Contracts\ProviderAvailabilityInterface;
@@ -37,6 +39,36 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 			'url'   => is_string( $endpointUrl ) ? rtrim( trim( $endpointUrl ), '/' ) : '',
 			'token' => is_string( $authToken ) ? trim( $authToken ) : '',
 		);
+	}
+
+	/**
+	 * Resolves the request authentication to use for API calls.
+	 *
+	 * amazee.ai issues tokens in a `key_alias|token` format via the core
+	 * connector credentials; only the part after the pipe is the bearer
+	 * token. When no usable core credential is given, the token configured
+	 * via constant or option is used instead.
+	 *
+	 * @param RequestAuthenticationInterface|null $coreAuth Authentication provided by the AI client core, if any.
+	 * @throws RuntimeException If no token is configured anywhere.
+	 */
+	public static function resolveRequestAuthentication( ?RequestAuthenticationInterface $coreAuth ): RequestAuthenticationInterface {
+		if ( $coreAuth instanceof ApiKeyRequestAuthentication ) {
+			$rawKey = $coreAuth->getApiKey();
+			if ( false !== strpos( $rawKey, '|' ) ) {
+				list( , $tokenPart ) = explode( '|', $rawKey, 2 );
+				return new ApiKeyRequestAuthentication( trim( $tokenPart ) );
+			}
+			if ( '' !== trim( $rawKey ) ) {
+				return $coreAuth;
+			}
+		}
+
+		$config = static::getApiConfiguration();
+		if ( empty( $config['token'] ) ) {
+			throw new RuntimeException( 'The amazee.ai LLM token is not configured.' );
+		}
+		return new ApiKeyRequestAuthentication( $config['token'] );
 	}
 
 	/**

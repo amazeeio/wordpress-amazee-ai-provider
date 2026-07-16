@@ -3,7 +3,7 @@ Contributors: amazee.ai
 Tags: AI, llm, gpt, artificial-intelligence, connector, amazeeio
 Requires at least: 7.0
 Tested up to: 7.0
-Stable tag: 1.0
+Stable tag: 1.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -54,3 +54,14 @@ Install this plugin:
    - To actually use the connector, install and activate the official [AI Experiments](https://wordpress.org/plugins/ai/) plugin.
    - Navigate to Settings > AI Experiments (`/options-general.php?page=ai-experiments`)
    - Select »Enable Experiments« and Save.
+
+== Changelog ==
+
+= 1.1 =
+* Support Composer-based installs that provide a site-wide autoloader.
+* Filter request parameters against each model's supported OpenAI parameters.
+* Cache the model catalog for 12 hours per endpoint.
+* Show an actionable message when the amazee.ai budget is exceeded.
+
+= 1.0 =
+* Initial release.
