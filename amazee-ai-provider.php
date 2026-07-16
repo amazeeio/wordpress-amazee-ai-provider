@@ -3,7 +3,7 @@
  * Plugin Name: AI Provider for amazee.ai
  * Plugin URI: https://github.com/amazeeio/wordpress-amazee-ai-provider
  * Description: Adds amazee.ai AI hosting to the available AI providers
- * Version: 1.1
+ * Version: 1.2
  * Author: amazee.ai
  * Author URI: https://amazee.ai/
  * License: GPL-2.0-or-later
@@ -140,104 +140,7 @@ add_filter(
 	}
 );
 
-add_action(
-	'admin_init',
-	function () {
-		// Register individual settings.
-		register_setting(
-			'wp-ai-client-settings',
-			'wp_ai_client_amazee_endpoint_url',
-			array(
-				'type'              => 'string',
-				'sanitize_callback' => 'esc_url_raw',
-			)
-		);
-
-		register_setting(
-			'wp-ai-client-settings',
-			'wp_ai_client_amazee_llm_token',
-			array(
-				'type'              => 'string',
-				'sanitize_callback' => 'sanitize_text_field',
-			)
-		);
-
-		// Add custom settings fields under the core Connectors credentials section.
-		add_settings_field(
-			'wp-ai-client-amazee-endpoint-url',
-			__( 'amazee.ai ENDPOINT_URL', 'amazee-ai-provider' ),
-			function () {
-				$is_constant_defined = defined( 'AMAZEE_ENDPOINT_URL' );
-				$value               = defined( 'AMAZEE_ENDPOINT_URL' ) ? AMAZEE_ENDPOINT_URL : get_option( 'wp_ai_client_amazee_endpoint_url', '' );
-				?>
-				<input
-					type="url"
-					id="wp_ai_client_amazee_endpoint_url"
-					name="wp_ai_client_amazee_endpoint_url"
-					value="<?php echo esc_attr( $value ); ?>"
-					class="regular-text"
-					placeholder="https://llm.us103.amazee.ai/v1"
-					<?php disabled( $is_constant_defined ); ?>
-				>
-				<p class="description">
-					<?php
-					if ( $is_constant_defined ) {
-						esc_html_e( 'Configured via AMAZEE_ENDPOINT_URL constant in wp-config.php.', 'amazee-ai-provider' );
-					} else {
-						esc_html_e( 'The endpoint URL for your amazee.ai region.', 'amazee-ai-provider' );
-					}
-					?>
-				</p>
-				<?php
-			},
-			'wp-ai-client',
-			'wp-ai-client-provider-credentials'
-		);
-
-		add_settings_field(
-			'wp-ai-client-amazee-llm-token',
-			__( 'amazee.ai LLM_TOKEN', 'amazee-ai-provider' ),
-			function () {
-				$is_constant_defined = defined( 'AMAZEE_LLM_TOKEN' );
-				$value               = $is_constant_defined ? '••••••••••••••••' : get_option( 'wp_ai_client_amazee_llm_token', '' );
-				?>
-				<input
-					type="password"
-					id="wp_ai_client_amazee_llm_token"
-					name="wp_ai_client_amazee_llm_token"
-					value="<?php echo esc_attr( $value ); ?>"
-					class="regular-text"
-					<?php disabled( $is_constant_defined ); ?>
-				>
-				<p class="description">
-					<?php
-					if ( $is_constant_defined ) {
-						esc_html_e( 'Configured via AMAZEE_LLM_TOKEN constant in wp-config.php.', 'amazee-ai-provider' );
-					} else {
-						printf(
-							/* translators: %s: Link to my.amazee.io */
-							wp_kses(
-								__( 'Your amazee.ai LLM token. You can find or create this in the <a href="%s" target="_blank" rel="noopener noreferrer">amazee.ai dashboard<span class="screen-reader-text"> (opens in a new tab)</span></a>.', 'amazee-ai-provider' ),
-								array(
-									'a'    => array(
-										'href'   => array(),
-										'target' => array(),
-										'rel'    => array(),
-									),
-									'span' => array(
-										'class' => array(),
-									),
-								)
-							),
-							'https://my.amazee.io'
-						);
-					}
-					?>
-				</p>
-				<?php
-			},
-			'wp-ai-client',
-			'wp-ai-client-provider-credentials'
-		);
-	}
-);
+// Credentials are managed by the WordPress core Connectors screen
+// (Settings > Connectors), based on this provider's apiKey authentication
+// metadata. The legacy wp_ai_client_amazee_* options are still read as a
+// fallback for existing installs but no longer have their own UI.

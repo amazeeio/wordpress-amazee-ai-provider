@@ -43,6 +43,49 @@ class AmazeeIoAiProviderTest extends TestCase {
 		$this->assertEquals( 'constant-token', $config['token'] );
 	}
 
+	public function testGetApiConfigurationFromCoreConnectorCredential() {
+		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = 'https://llm.ch101.amazee.ai/v1/|core-token';
+
+		$config = AmazeeIoAiProvider::getApiConfiguration();
+
+		$this->assertEquals( 'https://llm.ch101.amazee.ai/v1', $config['url'] );
+		$this->assertEquals( 'core-token', $config['token'] );
+	}
+
+	public function testGetApiConfigurationCoreCredentialPlainToken() {
+		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = 'just-a-token';
+
+		$config = AmazeeIoAiProvider::getApiConfiguration();
+
+		$this->assertEquals( '', $config['url'] );
+		$this->assertEquals( 'just-a-token', $config['token'] );
+	}
+
+	public function testGetApiConfigurationLegacyOptionsWinOverCoreCredential() {
+		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_endpoint_url']  = 'https://llm.us103.amazee.ai/v1';
+		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_llm_token']     = 'legacy-token';
+		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key']    = 'https://llm.ch101.amazee.ai/v1|core-token';
+
+		$config = AmazeeIoAiProvider::getApiConfiguration();
+
+		$this->assertEquals( 'https://llm.us103.amazee.ai/v1', $config['url'] );
+		$this->assertEquals( 'legacy-token', $config['token'] );
+	}
+
+	public function testGetApiConfigurationCoreCredentialEnvVarWinsOverOption() {
+		putenv( 'AMAZEEIO_API_KEY=https://llm.de102.amazee.ai/v1|env-token' );
+		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = 'https://llm.ch101.amazee.ai/v1|db-token';
+
+		try {
+			$config = AmazeeIoAiProvider::getApiConfiguration();
+		} finally {
+			putenv( 'AMAZEEIO_API_KEY' );
+		}
+
+		$this->assertEquals( 'https://llm.de102.amazee.ai/v1', $config['url'] );
+		$this->assertEquals( 'env-token', $config['token'] );
+	}
+
 	public function testGetRequestAuthenticationFallback() {
 		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_llm_token'] = 'fallback-token';
 

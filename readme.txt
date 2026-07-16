@@ -3,7 +3,7 @@ Contributors: amazee.ai
 Tags: AI, llm, gpt, artificial-intelligence, connector, amazeeio
 Requires at least: 7.0
 Tested up to: 7.0
-Stable tag: 1.1
+Stable tag: 1.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -46,9 +46,8 @@ Install this plugin:
    - Log into your account at [my.amazee.io](https://my.amazee.io) to obtain your endpoint URL and LLM token.
 2. **Store AI Client Credentials**:
    - Navigate to Settings > Connectors (`/wp-admin/options-connectors.php`) in WordPress.
-   - Locate the **amazee.ai** section and fill in:
-     - **amazee.ai ENDPOINT_URL**: e.g. `https://llm.us103.amazee.ai/v1`
-     - **amazee.ai LLM_TOKEN**: Your private LLM token.
+   - Locate the **amazee.ai** connector and enter your credential as `https://llm.<region>.amazee.ai/v1|<token>` (endpoint URL, a pipe, then your LLM token).
+   - Alternatively define `AMAZEE_ENDPOINT_URL` and `AMAZEE_LLM_TOKEN` constants in `wp-config.php` (or set the `AMAZEEIO_API_KEY` environment variable to the `url|token` value) and skip the UI entirely.
    - Save the settings.
 3. **Enable AI experiments** (optional):
    - To actually use the connector, install and activate the official [AI Experiments](https://wordpress.org/plugins/ai/) plugin.
@@ -56,6 +55,11 @@ Install this plugin:
    - Select »Enable Experiments« and Save.
 
 == Changelog ==
+
+= 1.2 =
+* Integrate with the WordPress 7.0 Connectors screen: the provider now declares API-key authentication so core manages its credential (setting `connectors_ai_amazeeio_api_key`, constant/env `AMAZEEIO_API_KEY`).
+* The credential may include the endpoint: `https://llm.<region>.amazee.ai/v1|<token>`.
+* Remove the legacy settings fields (the pre-7.0 AI plugin settings page no longer exists); legacy options are still read as fallback.
 
 = 1.1 =
 * Support Composer-based installs that provide a site-wide autoloader.

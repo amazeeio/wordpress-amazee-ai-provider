@@ -13,6 +13,7 @@ use WordPress\AiClient\Common\Exception\RuntimeException;
 use WordPress\AiClient\Providers\ApiBasedImplementation\AbstractApiProvider;
 use WordPress\AiClient\Providers\Http\Contracts\RequestAuthenticationInterface;
 use WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication;
+use WordPress\AiClient\Providers\Http\Enums\RequestAuthenticationMethod;
 use WordPress\AiClient\Providers\ApiBasedImplementation\ListModelsApiBasedProviderAvailability;
 use WordPress\AiClient\Providers\Contracts\ModelMetadataDirectoryInterface;
 use WordPress\AiClient\Providers\Contracts\ProviderAvailabilityInterface;
@@ -35,10 +36,66 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 		$endpointUrl = defined( 'AMAZEE_ENDPOINT_URL' ) ? AMAZEE_ENDPOINT_URL : get_option( 'wp_ai_client_amazee_endpoint_url', '' );
 		$authToken   = defined( 'AMAZEE_LLM_TOKEN' ) ? AMAZEE_LLM_TOKEN : get_option( 'wp_ai_client_amazee_llm_token', '' );
 
+		$endpointUrl = is_string( $endpointUrl ) ? trim( $endpointUrl ) : '';
+		$authToken   = is_string( $authToken ) ? trim( $authToken ) : '';
+
+		// Fall back to the credential managed via the WordPress core
+		// Connectors screen, which may carry the endpoint as `url|token`.
+		if ( '' === $endpointUrl || '' === $authToken ) {
+			list( $coreUrl, $coreToken ) = self::parseCredential( self::getCoreConnectorCredential() );
+			if ( '' === $endpointUrl ) {
+				$endpointUrl = $coreUrl;
+			}
+			if ( '' === $authToken ) {
+				$authToken = $coreToken;
+			}
+		}
+
 		return array(
-			'url'   => is_string( $endpointUrl ) ? rtrim( trim( $endpointUrl ), '/' ) : '',
-			'token' => is_string( $authToken ) ? trim( $authToken ) : '',
+			'url'   => rtrim( $endpointUrl, '/' ),
+			'token' => $authToken,
 		);
+	}
+
+	/**
+	 * Returns the raw credential stored by the WordPress core Connectors screen.
+	 *
+	 * Checked in the same order core uses: environment variable, constant,
+	 * then the setting written by the Connectors UI.
+	 */
+	private static function getCoreConnectorCredential(): string {
+		$envValue = getenv( 'AMAZEEIO_API_KEY' );
+		if ( is_string( $envValue ) && '' !== $envValue ) {
+			return $envValue;
+		}
+		if ( defined( 'AMAZEEIO_API_KEY' ) && is_string( AMAZEEIO_API_KEY ) ) {
+			return AMAZEEIO_API_KEY;
+		}
+
+		$option = get_option( 'connectors_ai_amazeeio_api_key', '' );
+		return is_string( $option ) ? $option : '';
+	}
+
+	/**
+	 * Splits a stored credential into endpoint URL and token.
+	 *
+	 * Supported formats: `token`, `key_alias|token` and
+	 * `https://llm.<region>.amazee.ai/v1|token`.
+	 *
+	 * @param string $credential Raw credential value.
+	 * @return array{0: string, 1: string} Endpoint URL (may be empty) and token.
+	 */
+	private static function parseCredential( string $credential ): array {
+		$credential = trim( $credential );
+		if ( false === strpos( $credential, '|' ) ) {
+			return array( '', $credential );
+		}
+
+		list( $prefix, $token ) = explode( '|', $credential, 2 );
+		$prefix                 = trim( $prefix );
+		$url                    = preg_match( '#^https?://#i', $prefix ) ? $prefix : '';
+
+		return array( $url, trim( $token ) );
 	}
 
 	/**
@@ -115,8 +172,8 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 			'amazee.ai',
 			ProviderTypeEnum::server(),
 			'https://my.amazee.io',
-			null,
-			__( 'Connects your site to secure open-weight LLMs hosted by amazee.ai.', 'amazee-ai-provider' ),
+			RequestAuthenticationMethod::apiKey(),
+			__( 'Connects your site to secure open-weight LLMs hosted by amazee.ai. Enter your credential as https://llm.<region>.amazee.ai/v1|<token>, or just the token if the endpoint is set via the AMAZEE_ENDPOINT_URL constant.', 'amazee-ai-provider' ),
 			$iconLocation
 		);
 	}
