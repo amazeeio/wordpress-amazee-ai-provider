@@ -173,7 +173,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 			ProviderTypeEnum::server(),
 			'https://my.amazee.io',
 			RequestAuthenticationMethod::apiKey(),
-			__( 'Secure private AI for your site, hosted by amazee.ai. Enter your API URL and key as https://llm.<region>.amazee.ai/v1|<token>.', 'amazee-ai-provider' ),
+			__( 'Secure private AI for your site, hosted by amazee.ai. Copy the endpoint URL from my.amazee.io, add a | pipe, then your token: <endpoint URL>|<token>.', 'amazee-ai-provider' ),
 			$iconLocation
 		);
 	}
