@@ -65,6 +65,16 @@ class AmazeeIoAiProviderTest extends TestCase {
 		$this->assertEquals( 'env-token', $config['token'] );
 	}
 
+	public function testVersionConstantMatchesPluginHeaderAndReadme() {
+		$plugin = file_get_contents( dirname( __DIR__ ) . '/ai-provider-for-amazee-ai.php' );
+		preg_match( '/^\s*\*\s*Version:\s*(\S+)/m', $plugin, $matches );
+		$this->assertSame( AmazeeIoAiProvider::VERSION, $matches[1] ?? null, 'Version header in the main plugin file must match AmazeeIoAiProvider::VERSION.' );
+
+		$readme = file_get_contents( dirname( __DIR__ ) . '/readme.txt' );
+		preg_match( '/^Stable tag:\s*(\S+)/m', $readme, $matches );
+		$this->assertSame( AmazeeIoAiProvider::VERSION, $matches[1] ?? null, 'Stable tag in readme.txt must match AmazeeIoAiProvider::VERSION.' );
+	}
+
 	public function testGetRequestAuthenticationFallback() {
 		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = 'fallback-token';
 
