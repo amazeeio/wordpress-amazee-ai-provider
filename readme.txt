@@ -32,6 +32,19 @@ Models are dynamically loaded from your active LiteLLM region endpoint.
 - Tool/function calling
 - Streaming responses
 
+== External Services ==
+
+This plugin connects to the amazee.ai API to provide its functionality. It is not usable without an amazee.ai account and credentials.
+
+It connects to the amazee.ai endpoint you configure (for example `https://llm.<region>.amazee.ai/v1`) in two situations:
+
+* To retrieve the list of AI models available to your account (cached for 12 hours).
+* To send prompts and receive AI generated responses whenever you or a plugin on your site uses the WordPress AI features with amazee.ai selected as provider. The content of the prompt (which may include text you or your users enter) and the chosen model parameters are sent to the endpoint.
+
+No data is sent to amazee.ai until you configure your credentials, and no other data (such as analytics or telemetry) is collected by this plugin.
+
+This service is provided by amazee.ai: [terms and conditions](https://amazee.ai/terms-and-conditions), [privacy policy](https://amazee.ai/privacy-policy).
+
 == Installation ==
 
 Install this plugin:

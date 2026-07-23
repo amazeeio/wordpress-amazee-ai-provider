@@ -29,6 +29,11 @@ class AmazeeIoTextModel extends AbstractOpenAiCompatibleTextGenerationModel {
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @param HttpMethodEnum $method  HTTP method.
+	 * @param string         $path    Request path relative to the base URL.
+	 * @param array          $headers Request headers.
+	 * @param mixed          $data    Request body data.
 	 */
 	protected function createRequest( HttpMethodEnum $method, string $path, array $headers = array(), $data = null ): Request {
 		return new Request(
@@ -45,12 +50,12 @@ class AmazeeIoTextModel extends AbstractOpenAiCompatibleTextGenerationModel {
 	 */
 	public function getRequestAuthentication(): RequestAuthenticationInterface {
 		try {
-			$coreAuth = parent::getRequestAuthentication();
+			$core_auth = parent::getRequestAuthentication();
 		} catch ( \Exception $exception ) {
-			$coreAuth = null;
+			$core_auth = null;
 		}
 
-		return AmazeeIoAiProvider::resolveRequestAuthentication( $coreAuth );
+		return AmazeeIoAiProvider::resolveRequestAuthentication( $core_auth );
 	}
 
 	/**
@@ -60,6 +65,8 @@ class AmazeeIoTextModel extends AbstractOpenAiCompatibleTextGenerationModel {
 	 * `supported_openai_params` list the amazee.ai endpoint reports per
 	 * model. Prevents API errors from e.g. sending `temperature` to a
 	 * model that rejects it.
+	 *
+	 * @param array $prompt Prompt parts to generate text for.
 	 */
 	protected function prepareGenerateTextParams( array $prompt ): array {
 		$params = parent::prepareGenerateTextParams( $prompt );
@@ -82,6 +89,9 @@ class AmazeeIoTextModel extends AbstractOpenAiCompatibleTextGenerationModel {
 	 * {@inheritDoc}
 	 *
 	 * Maps amazee.ai budget errors to an actionable message.
+	 *
+	 * @param Response $response HTTP response to check.
+	 * @throws ClientException If the amazee.ai budget has been exceeded.
 	 */
 	protected function throwIfNotSuccessful( Response $response ): void {
 		if ( $response->isSuccessful() ) {
@@ -101,9 +111,11 @@ class AmazeeIoTextModel extends AbstractOpenAiCompatibleTextGenerationModel {
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @param array|null $output_schema JSON schema for the expected output, if any.
 	 */
-	protected function prepareResponseFormatParam( ?array $outputSchema ): array {
-		if ( null === $outputSchema ) {
+	protected function prepareResponseFormatParam( ?array $output_schema ): array {
+		if ( null === $output_schema ) {
 			return array( 'type' => 'json_object' );
 		}
 
@@ -111,7 +123,7 @@ class AmazeeIoTextModel extends AbstractOpenAiCompatibleTextGenerationModel {
 			'type'        => 'json_schema',
 			'json_schema' => array(
 				'name'   => 'outputSchema',
-				'schema' => $outputSchema,
+				'schema' => $output_schema,
 			),
 		);
 	}

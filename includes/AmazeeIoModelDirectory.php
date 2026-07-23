@@ -51,20 +51,20 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 	 * information. Returns null when unknown (cache expired or the endpoint
 	 * does not report the list), in which case no filtering should happen.
 	 *
-	 * @param string $modelId Model identifier.
+	 * @param string $model_id Model identifier.
 	 * @return list<string>|null
 	 */
-	public static function getSupportedApiParams( string $modelId ): ?array {
-		$modelData = get_transient( self::cacheKey() );
-		if ( ! is_array( $modelData ) ) {
+	public static function getSupportedApiParams( string $model_id ): ?array {
+		$model_data = get_transient( self::cacheKey() );
+		if ( ! is_array( $model_data ) ) {
 			return null;
 		}
 
-		foreach ( $modelData as $infoNode ) {
-			if ( ! is_array( $infoNode ) || ( $infoNode['model_name'] ?? null ) !== $modelId ) {
+		foreach ( $model_data as $info_node ) {
+			if ( ! is_array( $info_node ) || ( $info_node['model_name'] ?? null ) !== $model_id ) {
 				continue;
 			}
-			$params = $infoNode['model_info']['supported_openai_params'] ?? null;
+			$params = $info_node['model_info']['supported_openai_params'] ?? null;
 			return is_array( $params ) && array() !== $params ? array_values( $params ) : null;
 		}
 
@@ -73,6 +73,11 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @param HttpMethodEnum $method  HTTP method.
+	 * @param string         $path    Request path relative to the base URL.
+	 * @param array          $headers Request headers.
+	 * @param mixed          $data    Request body data.
 	 */
 	protected function createRequest( HttpMethodEnum $method, string $path, array $headers = array(), $data = null ): Request {
 		return new Request(
@@ -88,33 +93,33 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 	 */
 	public function getRequestAuthentication(): RequestAuthenticationInterface {
 		try {
-			$coreAuth = parent::getRequestAuthentication();
+			$core_auth = parent::getRequestAuthentication();
 		} catch ( \Exception $exception ) {
-			$coreAuth = null;
+			$core_auth = null;
 		}
 
-		return AmazeeIoAiProvider::resolveRequestAuthentication( $coreAuth );
+		return AmazeeIoAiProvider::resolveRequestAuthentication( $core_auth );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	protected function sendListModelsRequest(): array {
-		$modelData = get_transient( self::cacheKey() );
-		if ( ! is_array( $modelData ) ) {
-			$modelData = $this->fetchModelData();
-			set_transient( self::cacheKey(), $modelData, self::CACHE_TTL );
+		$model_data = get_transient( self::cacheKey() );
+		if ( ! is_array( $model_data ) ) {
+			$model_data = $this->fetchModelData();
+			set_transient( self::cacheKey(), $model_data, self::CACHE_TTL );
 		}
 
-		$metadataList = array();
-		foreach ( $modelData as $infoNode ) {
-			$metadata = $this->modelMetadataFromInfo( $infoNode );
+		$metadata_list = array();
+		foreach ( $model_data as $info_node ) {
+			$metadata = $this->modelMetadataFromInfo( $info_node );
 			if ( null !== $metadata ) {
-				$metadataList[ $metadata->getId() ] = $metadata;
+				$metadata_list[ $metadata->getId() ] = $metadata;
 			}
 		}
 
-		return $metadataList;
+		return $metadata_list;
 	}
 
 	/**
@@ -124,13 +129,13 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 	 */
 	private function fetchModelData(): array {
 		$transporter = $this->getHttpTransporter();
-		$apiReq      = $this->createRequest( HttpMethodEnum::GET(), 'model/info' );
-		$apiReq      = $this->getRequestAuthentication()->authenticateRequest( $apiReq );
-		$apiRes      = $transporter->send( $apiReq );
+		$api_req      = $this->createRequest( HttpMethodEnum::GET(), 'model/info' );
+		$api_req      = $this->getRequestAuthentication()->authenticateRequest( $api_req );
+		$api_res      = $transporter->send( $api_req );
 
-		$this->throwIfNotSuccessful( $apiRes );
+		$this->throwIfNotSuccessful( $api_res );
 
-		$body = $apiRes->getData();
+		$body = $api_res->getData();
 		if ( ! isset( $body['data'] ) || ! is_array( $body['data'] ) ) {
 			return array();
 		}
@@ -144,15 +149,15 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 	 * Only chat models are exposed; capabilities and options are derived
 	 * from the capability flags the endpoint reports for each model.
 	 *
-	 * @param mixed $infoNode Raw node from the model info response.
+	 * @param mixed $info_node Raw node from the model info response.
 	 */
-	private function modelMetadataFromInfo( $infoNode ): ?ModelMetadata {
-		if ( ! is_array( $infoNode ) || ! isset( $infoNode['model_name'] ) ) {
+	private function modelMetadataFromInfo( $info_node ): ?ModelMetadata {
+		if ( ! is_array( $info_node ) || ! isset( $info_node['model_name'] ) ) {
 			return null;
 		}
 
-		$id   = $infoNode['model_name'];
-		$meta = $infoNode['model_info'] ?? null;
+		$id   = $info_node['model_name'];
+		$meta = $info_node['model_info'] ?? null;
 		if ( ! is_array( $meta ) || 'chat' !== ( $meta['mode'] ?? '' ) ) {
 			return null;
 		}
@@ -196,6 +201,8 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @param Response $response HTTP response to parse.
 	 */
 	protected function parseResponseToModelMetadataList( Response $response ): array {
 		return array();

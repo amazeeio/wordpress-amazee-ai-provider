@@ -16,6 +16,7 @@ jobs:
       - run: composer install --no-progress
       - run: composer test
       - run: composer analyse
+      - run: composer format
 
   plugin-check:
     runs-on: ubuntu-latest

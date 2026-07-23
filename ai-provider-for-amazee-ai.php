@@ -10,6 +10,8 @@
  * Author URI: https://amazee.ai/
  * License: GPL-2.0-or-later
  * Text Domain: ai-provider-for-amazee-ai
+ *
+ * @package Amazee\AiProvider
  */
 
 namespace Amazee\AiProvider;
