@@ -15,16 +15,6 @@ class AmazeeIoAiProviderTest extends TestCase {
 		$GLOBALS['wp_mock_constants'] = array();
 	}
 
-	public function testGetApiConfigurationWithDbOptions() {
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_endpoint_url'] = 'https://llm.us103.amazee.ai/v1/';
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_llm_token'] = 'my-token';
-
-		$config = AmazeeIoAiProvider::getApiConfiguration();
-
-		$this->assertEquals( 'https://llm.us103.amazee.ai/v1', $config['url'] ); // Trims trailing slash.
-		$this->assertEquals( 'my-token', $config['token'] );
-	}
-
 	/**
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
@@ -61,17 +51,6 @@ class AmazeeIoAiProviderTest extends TestCase {
 		$this->assertEquals( 'just-a-token', $config['token'] );
 	}
 
-	public function testGetApiConfigurationLegacyOptionsWinOverCoreCredential() {
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_endpoint_url']  = 'https://llm.us103.amazee.ai/v1';
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_llm_token']     = 'legacy-token';
-		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key']    = 'https://llm.ch101.amazee.ai/v1|core-token';
-
-		$config = AmazeeIoAiProvider::getApiConfiguration();
-
-		$this->assertEquals( 'https://llm.us103.amazee.ai/v1', $config['url'] );
-		$this->assertEquals( 'legacy-token', $config['token'] );
-	}
-
 	public function testGetApiConfigurationCoreCredentialEnvVarWinsOverOption() {
 		putenv( 'AMAZEEIO_API_KEY=https://llm.de102.amazee.ai/v1|env-token' );
 		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = 'https://llm.ch101.amazee.ai/v1|db-token';
@@ -87,7 +66,7 @@ class AmazeeIoAiProviderTest extends TestCase {
 	}
 
 	public function testGetRequestAuthenticationFallback() {
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_llm_token'] = 'fallback-token';
+		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = 'fallback-token';
 
 		$directory = new AmazeeIoModelDirectory();
 		$auth = $directory->getRequestAuthentication();

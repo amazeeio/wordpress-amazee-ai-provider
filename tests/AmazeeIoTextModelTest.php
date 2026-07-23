@@ -24,8 +24,7 @@ class AmazeeIoTextModelTest extends TestCase {
 		parent::setUp();
 		$GLOBALS['wp_mock_options']    = array();
 		$GLOBALS['wp_mock_transients'] = array();
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_endpoint_url'] = 'https://llm.us103.amazee.ai/v1';
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_llm_token']    = 'test-token';
+		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = 'https://llm.us103.amazee.ai/v1|test-token';
 	}
 
 	private function createModel( string $modelId = 'test-model' ): AmazeeIoTextModel {
@@ -57,7 +56,7 @@ class AmazeeIoTextModelTest extends TestCase {
 	}
 
 	public function testResolveRequestAuthenticationThrowsWhenUnconfigured() {
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_llm_token'] = '';
+		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = '';
 
 		$this->expectException( RuntimeException::class );
 		AmazeeIoAiProvider::resolveRequestAuthentication( null );

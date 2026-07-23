@@ -72,7 +72,6 @@ Install this plugin:
 = 1.2 =
 * Integrate with the WordPress 7.0 Connectors screen: the provider now declares API-key authentication so core manages its credential (setting `connectors_ai_amazeeio_api_key`, constant/env `AMAZEEIO_API_KEY`).
 * The credential may include the endpoint: `https://llm.<region>.amazee.ai/v1|<token>`.
-* Remove the legacy settings fields (the pre-7.0 AI plugin settings page no longer exists); legacy options are still read as fallback.
 
 = 1.1 =
 * Support Composer-based installs that provide a site-wide autoloader.

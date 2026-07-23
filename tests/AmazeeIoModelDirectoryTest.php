@@ -11,8 +11,7 @@ class AmazeeIoModelDirectoryTest extends TestCase {
 		parent::setUp();
 		$GLOBALS['wp_mock_options']    = array();
 		$GLOBALS['wp_mock_transients'] = array();
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_endpoint_url'] = 'https://llm.us103.amazee.ai/v1';
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_llm_token']    = 'test-token';
+		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = 'https://llm.us103.amazee.ai/v1|test-token';
 	}
 
 	private function seedModelData( array $data ): void {
@@ -21,7 +20,7 @@ class AmazeeIoModelDirectoryTest extends TestCase {
 
 	public function testCacheKeyVariesWithEndpointUrl() {
 		$keyA = AmazeeIoModelDirectory::cacheKey();
-		$GLOBALS['wp_mock_options']['wp_ai_client_amazee_endpoint_url'] = 'https://llm.ch101.amazee.ai/v1';
+		$GLOBALS['wp_mock_options']['connectors_ai_amazeeio_api_key'] = 'https://llm.ch101.amazee.ai/v1|test-token';
 		$keyB = AmazeeIoModelDirectory::cacheKey();
 
 		$this->assertNotEquals( $keyA, $keyB );

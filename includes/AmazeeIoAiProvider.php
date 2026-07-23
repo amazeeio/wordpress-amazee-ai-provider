@@ -33,8 +33,8 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	 * @return array{url: string, token: string} Configuration array containing url and token keys.
 	 */
 	public static function getApiConfiguration(): array {
-		$endpoint_url = defined( 'AMAZEE_ENDPOINT_URL' ) ? AMAZEE_ENDPOINT_URL : get_option( 'wp_ai_client_amazee_endpoint_url', '' );
-		$auth_token   = defined( 'AMAZEE_LLM_TOKEN' ) ? AMAZEE_LLM_TOKEN : get_option( 'wp_ai_client_amazee_llm_token', '' );
+		$endpoint_url = defined( 'AMAZEE_ENDPOINT_URL' ) ? AMAZEE_ENDPOINT_URL : '';
+		$auth_token   = defined( 'AMAZEE_LLM_TOKEN' ) ? AMAZEE_LLM_TOKEN : '';
 
 		$endpoint_url = is_string( $endpoint_url ) ? trim( $endpoint_url ) : '';
 		$auth_token   = is_string( $auth_token ) ? trim( $auth_token ) : '';

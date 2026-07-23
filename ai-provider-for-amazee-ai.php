@@ -147,5 +147,4 @@ add_filter(
 
 // Credentials are managed by the WordPress core Connectors screen
 // (Settings > Connectors), based on this provider's apiKey authentication
-// metadata. The legacy wp_ai_client_amazee_* options are still read as a
-// fallback for existing installs but no longer have their own UI.
+// metadata.
