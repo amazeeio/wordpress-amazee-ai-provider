@@ -131,9 +131,9 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 	 */
 	private function fetchModelData(): array {
 		$transporter = $this->getHttpTransporter();
-		$api_req      = $this->createRequest( HttpMethodEnum::GET(), 'model/info' );
-		$api_req      = $this->getRequestAuthentication()->authenticateRequest( $api_req );
-		$api_res      = $transporter->send( $api_req );
+		$api_req     = $this->createRequest( HttpMethodEnum::GET(), 'model/info' );
+		$api_req     = $this->getRequestAuthentication()->authenticateRequest( $api_req );
+		$api_res     = $transporter->send( $api_req );
 
 		$this->throwIfNotSuccessful( $api_res );
 
