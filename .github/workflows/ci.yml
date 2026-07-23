@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      - run: composer install --no-progress
+      - run: composer test
+      - run: composer analyse
+
+  plugin-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      - name: Build release copy
+        run: |
+          mkdir -p build/ai-provider-for-amazee-ai
+          rsync -a --exclude-from=.distignore --exclude build --exclude vendor ./ build/ai-provider-for-amazee-ai/
+          composer install --no-dev --no-progress --working-dir=build/ai-provider-for-amazee-ai
+          rm -f build/ai-provider-for-amazee-ai/composer.lock
+      - uses: WordPress/plugin-check-action@v1
+        with:
+          build-dir: build/ai-provider-for-amazee-ai
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-provider-for-amazee-ai
+          path: build/

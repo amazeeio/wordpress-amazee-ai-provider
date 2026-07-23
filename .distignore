@@ -1,6 +1,7 @@
 .claude
 .distignore
 .git
+.github
 .gitignore
 .phpunit.cache
 composer.lock
