@@ -62,6 +62,20 @@ class AmazeeIoTextModelTest extends TestCase {
 		AmazeeIoAiProvider::resolveRequestAuthentication( null );
 	}
 
+	public function testCreateRequestIncludesClientHeader() {
+		$model  = $this->createModel();
+		$method = new \ReflectionMethod( $model, 'createRequest' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+		$request = $method->invoke( $model, \WordPress\AiClient\Providers\Http\Enums\HttpMethodEnum::GET(), 'models' );
+
+		$this->assertEquals(
+			'ai-provider-for-amazee-ai/' . AmazeeIoAiProvider::VERSION,
+			$request->getHeaderAsString( 'X-Amazee-Client' )
+		);
+	}
+
 	public function testPrepareGenerateTextParamsFiltersUnsupportedParams() {
 		$model = $this->createModel( 'strict-model' );
 		$model->setConfig(

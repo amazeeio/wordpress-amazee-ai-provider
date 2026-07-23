@@ -28,6 +28,20 @@ use WordPress\AiClient\Providers\Models\DTO\ModelMetadata;
 class AmazeeIoAiProvider extends AbstractApiProvider {
 
 	/**
+	 * Plugin version, sent as client identification header on API requests.
+	 *
+	 * Must be kept in sync with the version in the main plugin file.
+	 */
+	public const VERSION = '1.2';
+
+	/**
+	 * Value of the `X-Amazee-Client` header sent with every API request.
+	 */
+	public static function clientHeaderValue(): string {
+		return 'ai-provider-for-amazee-ai/' . self::VERSION;
+	}
+
+	/**
 	 * Retrieves the configured endpoint and access token.
 	 *
 	 * @return array{url: string, token: string} Configuration array containing url and token keys.

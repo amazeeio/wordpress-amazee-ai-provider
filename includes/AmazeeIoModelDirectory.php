@@ -80,6 +80,8 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 	 * @param mixed          $data    Request body data.
 	 */
 	protected function createRequest( HttpMethodEnum $method, string $path, array $headers = array(), $data = null ): Request {
+		$headers['X-Amazee-Client'] = AmazeeIoAiProvider::clientHeaderValue();
+
 		return new Request(
 			$method,
 			AmazeeIoAiProvider::url( $path ),

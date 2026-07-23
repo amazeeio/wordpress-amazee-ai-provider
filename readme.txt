@@ -41,7 +41,7 @@ It connects to the amazee.ai endpoint you configure (for example `https://llm.<r
 * To retrieve the list of AI models available to your account (cached for 12 hours).
 * To send prompts and receive AI generated responses whenever you or a plugin on your site uses the WordPress AI features with amazee.ai selected as provider. The content of the prompt (which may include text you or your users enter) and the chosen model parameters are sent to the endpoint.
 
-No data is sent to amazee.ai until you configure your credentials, and no other data (such as analytics or telemetry) is collected by this plugin.
+No data is sent to amazee.ai until you configure your credentials, and no other data (such as analytics or telemetry) is collected by this plugin. Every request includes an `X-Amazee-Client` header identifying this plugin and its version.
 
 This service is provided by amazee.ai: [terms and conditions](https://amazee.ai/terms-and-conditions), [privacy policy](https://amazee.ai/privacy-policy).
 
@@ -72,6 +72,7 @@ Install this plugin:
 = 1.2 =
 * Integrate with the WordPress 7.0 Connectors screen: the provider now declares API-key authentication so core manages its credential (setting `connectors_ai_amazeeio_api_key`, constant/env `AMAZEEIO_API_KEY`).
 * The credential may include the endpoint: `https://llm.<region>.amazee.ai/v1|<token>`.
+* Send an `X-Amazee-Client` header identifying the plugin and version with every API request.
 
 = 1.1 =
 * Support Composer-based installs that provide a site-wide autoloader.
