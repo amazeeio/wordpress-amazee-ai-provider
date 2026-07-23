@@ -1,5 +1,5 @@
 === AI Provider for amazee.ai ===
-Contributors: amazeeio
+Contributors: dan2k3k4
 Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
 Tested up to: 7.0
