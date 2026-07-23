@@ -154,7 +154,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 		}
 
 		throw new RuntimeException(
-			sprintf( 'Capabilities not supported by amazee.ai provider: %s', implode( ', ', $caps ) )
+			sprintf( 'Capabilities not supported by amazee.ai provider: %s', esc_html( implode( ', ', $caps ) ) )
 		);
 	}
 
@@ -173,7 +173,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 			ProviderTypeEnum::server(),
 			'https://my.amazee.io',
 			RequestAuthenticationMethod::apiKey(),
-			__( 'Secure private AI for your site, hosted by amazee.ai. Copy the endpoint URL from my.amazee.io, add a | pipe, then your token: <endpoint URL>|<token>.', 'amazee-ai-provider' ),
+			__( 'Secure private AI for your site, hosted by amazee.ai. Copy the endpoint URL from my.amazee.io, add a | pipe, then your token: <endpoint URL>|<token>.', 'ai-provider-for-amazee-ai' ),
 			$iconLocation
 		);
 	}

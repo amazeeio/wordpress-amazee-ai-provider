@@ -1,0 +1,15 @@
+.claude
+.distignore
+.git
+.gitignore
+.phpunit.cache
+composer.lock
+docs
+plans
+tests
+GEMINI.md
+LEARNINGS.gemini.md
+README.md
+phpcs.xml
+phpstan.neon
+phpunit.xml.dist

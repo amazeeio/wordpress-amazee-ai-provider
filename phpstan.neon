@@ -2,4 +2,4 @@ parameters:
 	level: 5
 	paths:
 		- includes/
-		- amazee-ai-provider.php
+		- ai-provider-for-amazee-ai.php

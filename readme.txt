@@ -1,6 +1,6 @@
 === AI Provider for amazee.ai ===
-Contributors: amazee.ai
-Tags: AI, llm, gpt, artificial-intelligence, connector, amazeeio
+Contributors: amazeeio
+Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
 Tested up to: 7.0
 Stable tag: 1.2
@@ -8,7 +8,7 @@ Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Connects WordPress AI to amazee.ai private AI hosting, enabling AI-powered features via an OpenAI/LiteLLM-compatible provider integration.
+Connect the WordPress AI features to private AI hosting from amazee.ai for secure and privacy friendly language models on your site.
 
 == Description ==
 
@@ -36,7 +36,7 @@ Models are dynamically loaded from your active LiteLLM region endpoint.
 
 Install this plugin:
 
-* Clone the repository into `wp-content/plugins/amazee-ai-provider`
+* Clone the repository into `wp-content/plugins/ai-provider-for-amazee-ai`
 * Run `composer install --no-dev` inside the plugin directory
 * Activate the plugin in WordPress
 

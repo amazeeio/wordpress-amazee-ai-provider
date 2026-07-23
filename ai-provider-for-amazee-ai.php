@@ -4,9 +4,12 @@
  * Plugin URI: https://github.com/amazeeio/wordpress-amazee-ai-provider
  * Description: Adds amazee.ai AI hosting to the available AI providers
  * Version: 1.2
+ * Requires at least: 7.0
+ * Requires PHP: 7.4
  * Author: amazee.ai
  * Author URI: https://amazee.ai/
  * License: GPL-2.0-or-later
+ * Text Domain: ai-provider-for-amazee-ai
  */
 
 namespace Amazee\AiProvider;
@@ -68,7 +71,7 @@ function bootstrap(): void {
 		queue_admin_error_notice(
 			sprintf(
 				/* translators: %1$s: minimum WordPress version, %2$s: current WordPress version */
-				__( 'The AI Provider for amazee.ai plugin requires WordPress %1$s or newer. Current version: %2$s.', 'amazee-ai-provider' ),
+				__( 'The AI Provider for amazee.ai plugin requires WordPress %1$s or newer. Current version: %2$s.', 'ai-provider-for-amazee-ai' ),
 				MINIMUM_WP_VERSION,
 				'<code>' . esc_html( wp_get_wp_version() ) . '</code>'
 			)
@@ -78,7 +81,7 @@ function bootstrap(): void {
 
 	if ( ! class_exists( \WordPress\AiClient\AiClient::class ) ) {
 		queue_admin_error_notice(
-			__( 'The AI Provider for amazee.ai plugin requires the WordPress AI client available in WordPress 7.0 and newer.', 'amazee-ai-provider' )
+			__( 'The AI Provider for amazee.ai plugin requires the WordPress AI client available in WordPress 7.0 and newer.', 'ai-provider-for-amazee-ai' )
 		);
 		return;
 	}
@@ -97,7 +100,7 @@ function bootstrap(): void {
 		queue_admin_error_notice(
 			sprintf(
 				/* translators: %1$s: composer install command, %2$s: plugin directory path */
-				__( 'Your installation of the amazee.ai AI provider plugin is incomplete. Please run %1$s in the %2$s directory.', 'amazee-ai-provider' ),
+				__( 'Your installation of the amazee.ai AI provider plugin is incomplete. Please run %1$s in the %2$s directory.', 'ai-provider-for-amazee-ai' ),
 				'<code>composer install --no-dev</code>',
 				'<code>' . esc_html( plugin_dir_path( __FILE__ ) ) . '</code>'
 			)
@@ -131,7 +134,7 @@ add_filter(
 		$settings_link = sprintf(
 			'<a href="%1$s">%2$s</a>',
 			admin_url( $settings_page_url ),
-			esc_html__( 'Settings', 'amazee-ai-provider' )
+			esc_html__( 'Settings', 'ai-provider-for-amazee-ai' )
 		);
 
 		array_unshift( $links, $settings_link );
