@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Amazee\AiProvider;
 
+use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Common\Exception\RuntimeException;
 use WordPress\AiClient\Providers\ApiBasedImplementation\AbstractApiProvider;
 use WordPress\AiClient\Providers\Http\Contracts\RequestAuthenticationInterface;
@@ -53,10 +54,10 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 		$endpoint_url = is_string( $endpoint_url ) ? trim( $endpoint_url ) : '';
 		$auth_token   = is_string( $auth_token ) ? trim( $auth_token ) : '';
 
-		// Fall back to the credential managed via the WordPress core
-		// Connectors screen, which may carry the endpoint as `url|token`.
+		// Fall back to the credential the AI client holds for this provider,
+		// which may carry the endpoint as `url|token`.
 		if ( '' === $endpoint_url || '' === $auth_token ) {
-			list( $core_url, $core_token ) = self::parseCredential( self::getCoreConnectorCredential() );
+			list( $core_url, $core_token ) = self::parseCredential( self::getClientCredential() );
 			if ( '' === $endpoint_url ) {
 				$endpoint_url = $core_url;
 			}
@@ -72,22 +73,25 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	}
 
 	/**
-	 * Returns the raw credential stored by the WordPress core Connectors screen.
+	 * Returns the credential the AI client holds for this provider.
 	 *
-	 * Checked in the same order core uses: environment variable, constant,
-	 * then the setting written by the Connectors UI.
+	 * The client is the only reader of the stored credential: it resolves the
+	 * environment variable, the constant, or the value the user configured for
+	 * this provider on the Connectors screen, and hands the result to the
+	 * provider it belongs to. The plugin never reads those stores itself.
 	 */
-	private static function getCoreConnectorCredential(): string {
-		$env_value = getenv( 'AMAZEEIO_API_KEY' );
-		if ( is_string( $env_value ) && '' !== $env_value ) {
-			return $env_value;
-		}
-		if ( defined( 'AMAZEEIO_API_KEY' ) && is_string( AMAZEEIO_API_KEY ) ) {
-			return AMAZEEIO_API_KEY;
+	private static function getClientCredential(): string {
+		if ( ! class_exists( AiClient::class ) ) {
+			return '';
 		}
 
-		$option = get_option( 'connectors_ai_amazeeio_api_key', '' );
-		return is_string( $option ) ? $option : '';
+		$registry = AiClient::defaultRegistry();
+		if ( ! $registry->hasProvider( self::class ) ) {
+			return '';
+		}
+
+		$auth = $registry->getProviderRequestAuthentication( self::class );
+		return $auth instanceof ApiKeyRequestAuthentication ? $auth->getApiKey() : '';
 	}
 
 	/**

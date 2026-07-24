@@ -90,3 +90,20 @@ if ( ! function_exists( 'wp_get_wp_version' ) ) {
 		return '7.0';
 	}
 }
+
+/**
+ * Hands the provider a credential the way the AI client does at runtime.
+ *
+ * The plugin reads the credential back off the client registry, so tests have
+ * to put it there rather than into a mock option.
+ */
+function amazeeio_test_set_credential( string $credential ): void {
+	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+	if ( ! $registry->hasProvider( \Amazee\AiProvider\AmazeeIoAiProvider::class ) ) {
+		$registry->registerProvider( \Amazee\AiProvider\AmazeeIoAiProvider::class );
+	}
+	$registry->setProviderRequestAuthentication(
+		\Amazee\AiProvider\AmazeeIoAiProvider::class,
+		new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $credential )
+	);
+}
