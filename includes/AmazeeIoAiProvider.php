@@ -33,7 +33,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	 *
 	 * Must be kept in sync with the version in the main plugin file.
 	 */
-	public const VERSION = '1.2';
+	public const VERSION = '1.2.1';
 
 	/**
 	 * Value of the `X-Amazee-Client` header sent with every API request.

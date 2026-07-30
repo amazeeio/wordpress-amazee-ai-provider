@@ -3,7 +3,7 @@ Contributors: dan2k3k4
 Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
 Tested up to: 7.0
-Stable tag: 1.2
+Stable tag: 1.2.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -47,11 +47,25 @@ This service is provided by amazee.ai: [terms and conditions](https://amazee.ai/
 
 == Installation ==
 
-Install this plugin:
+= From within WordPress =
 
-* Clone the repository into `wp-content/plugins/ai-provider-for-amazee-ai`
-* Run `composer install --no-dev` inside the plugin directory
-* Activate the plugin in WordPress
+1. Visit Plugins > Add New.
+2. Search for **AI Provider for amazee.ai**, then click Install Now and Activate.
+3. Follow the Configuration steps below.
+
+= Manual installation =
+
+1. Download the plugin zip, then upload it via Plugins > Add New > Upload Plugin. Or extract it into `wp-content/plugins/` yourself.
+2. Activate the plugin through the Plugins menu in WordPress.
+3. Follow the Configuration steps below.
+
+= Composer =
+
+For sites managed with Composer:
+
+    composer require wpackagist-plugin/ai-provider-for-amazee-ai
+
+Released versions bundle their own autoloader, so there is no build step. Only if you install from a Git clone do you need to run `composer install --no-dev` inside the plugin directory.
 
 = Configuration =
 
@@ -68,6 +82,9 @@ Install this plugin:
    - Select »Enable Experiments« and Save.
 
 == Changelog ==
+
+= 1.2.1 =
+* Rewrite the installation instructions for the WordPress.org release: install from Plugins > Add New, or upload the zip. Composer is now a note for Composer-managed sites rather than the only documented path.
 
 = 1.2 =
 * Integrate with the WordPress 7.0 Connectors screen: the provider now declares API-key authentication, so the credential is stored and resolved by the core AI Client and handed to the provider through it. The plugin never reads the stored credential itself.
