@@ -29,3 +29,16 @@ jobs:
         run: gh release upload "${{ github.event.release.tag_name }}" "${{ steps.deploy.outputs.zip-path }}"
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Announce release in Slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: C0917Q6J7RS
+          VERSION: ${{ github.event.release.tag_name }}
+        run: |
+          text="New plugin release: AI Provider for amazee.ai $VERSION - https://wordpress.org/plugins/ai-provider-for-amazee-ai/"
+          response=$(curl -sS -X POST https://slack.com/api/chat.postMessage \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H 'Content-type: application/json; charset=utf-8' \
+            -d "$(jq -n --arg channel "$SLACK_CHANNEL" --arg text "$text" '{channel: $channel, text: $text}')")
+          # chat.postMessage answers 200 even when it refuses, so the ok flag is the real status.
+          echo "$response" | jq -e '.ok' >/dev/null || { echo "Slack rejected the message: $response"; exit 1; }
