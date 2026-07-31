@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Amazee\AiProvider;
 
+use WordPress\AiClient\Files\Enums\FileTypeEnum;
 use WordPress\AiClient\Messages\Enums\ModalityEnum;
 use WordPress\AiClient\Providers\Http\Contracts\RequestAuthenticationInterface;
 use WordPress\AiClient\Providers\Http\DTO\Request;
@@ -148,8 +149,10 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 	/**
 	 * Builds model metadata from a single `model/info` node.
 	 *
-	 * Only chat models are exposed; capabilities and options are derived
-	 * from the capability flags the endpoint reports for each model.
+	 * The `mode` the endpoint reports for a model decides which capabilities it
+	 * is exposed with, so a region offering image generation models advertises
+	 * image generation without any change here. Capabilities and options within
+	 * a mode are derived from the flags reported for the model.
 	 *
 	 * @param mixed $info_node Raw node from the model info response.
 	 */
@@ -160,7 +163,20 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 
 		$id   = $info_node['model_name'];
 		$meta = $info_node['model_info'] ?? null;
-		if ( ! is_array( $meta ) || 'chat' !== ( $meta['mode'] ?? '' ) ) {
+		if ( ! is_array( $meta ) ) {
+			return null;
+		}
+
+		$mode = $meta['mode'] ?? '';
+
+		if ( 'image_generation' === $mode ) {
+			return self::imageModelMetadata( $id );
+		}
+
+		// ponytail: other modes (embedding, audio_transcription, responses, …)
+		// need model classes the AI client has no OpenAI-compatible base class
+		// for; add a branch here once it ships one.
+		if ( 'chat' !== $mode ) {
 			return null;
 		}
 
@@ -199,6 +215,26 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 		$options[] = new SupportedOption( OptionEnum::outputModalities(), array( array( ModalityEnum::text() ) ) );
 
 		return new ModelMetadata( $id, $id, $capabilities, $options );
+	}
+
+	/**
+	 * Builds metadata for a model the endpoint reports as `image_generation`.
+	 *
+	 * The `supported_openai_params` list these models report describes the chat
+	 * API rather than `images/generations`, so it is not used here. Only the
+	 * inline file type is advertised, matching the base64 payload the endpoint
+	 * returns.
+	 *
+	 * @param string $id Model identifier.
+	 */
+	private static function imageModelMetadata( string $id ): ModelMetadata {
+		$options = array(
+			new SupportedOption( OptionEnum::inputModalities(), array( array( ModalityEnum::text() ) ) ),
+			new SupportedOption( OptionEnum::outputModalities(), array( array( ModalityEnum::image() ) ) ),
+			new SupportedOption( OptionEnum::outputFileType(), array( FileTypeEnum::inline() ) ),
+		);
+
+		return new ModelMetadata( $id, $id, array( CapabilityEnum::imageGeneration() ), $options );
 	}
 
 	/**

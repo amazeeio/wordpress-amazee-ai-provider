@@ -11,6 +11,8 @@ namespace Amazee\AiProvider;
 
 use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Common\Exception\RuntimeException;
+use WordPress\AiClient\Providers\Http\DTO\Response;
+use WordPress\AiClient\Providers\Http\Exception\ClientException;
 use WordPress\AiClient\Providers\ApiBasedImplementation\AbstractApiProvider;
 use WordPress\AiClient\Providers\Http\Contracts\RequestAuthenticationInterface;
 use WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication;
@@ -33,7 +35,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	 *
 	 * Must be kept in sync with the version in the main plugin file.
 	 */
-	public const VERSION = '1.2.1';
+	public const VERSION = '1.3';
 
 	/**
 	 * Value of the `X-Amazee-Client` header sent with every API request.
@@ -147,6 +149,28 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	}
 
 	/**
+	 * Maps an amazee.ai budget error to an actionable message.
+	 *
+	 * Shared by every model class, as any capability can run out of budget.
+	 *
+	 * @param Response $response HTTP response to check.
+	 * @throws ClientException If the amazee.ai budget has been exceeded.
+	 */
+	public static function throwOnBudgetError( Response $response ): void {
+		if ( $response->isSuccessful() ) {
+			return;
+		}
+
+		$data    = $response->getData();
+		$message = is_array( $data ) ? ( $data['error']['message'] ?? '' ) : '';
+		if ( is_string( $message ) && false !== stripos( $message, 'budget has been exceeded' ) ) {
+			throw new ClientException(
+				'Your amazee.ai budget has been exceeded. Review your plan and spend at https://my.amazee.io.'
+			);
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 *
 	 * @throws RuntimeException If no API URL is configured.
@@ -174,6 +198,9 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 		foreach ( $caps as $cap ) {
 			if ( $cap->isTextGeneration() ) {
 				return new AmazeeIoTextModel( $model_metadata, $provider_metadata );
+			}
+			if ( $cap->isImageGeneration() ) {
+				return new AmazeeIoImageModel( $model_metadata, $provider_metadata );
 			}
 		}
 
