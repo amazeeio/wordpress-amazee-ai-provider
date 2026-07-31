@@ -20,7 +20,7 @@ jobs:
       # Empty when there is nothing to release.
       version: ${{ steps.resolve.outputs.version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Resolve the version to release
         id: resolve
         env:
@@ -58,7 +58,7 @@ jobs:
     env:
       VERSION: ${{ needs.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'

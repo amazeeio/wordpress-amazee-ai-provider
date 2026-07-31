@@ -8,11 +8,17 @@ on:
 permissions:
   contents: read
 
+# A new push to the same branch or pull request makes the running checks
+# pointless, so drop them. Never applied to the deploy workflow.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
@@ -24,7 +30,7 @@ jobs:
   plugin-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
@@ -37,7 +43,7 @@ jobs:
       - uses: WordPress/plugin-check-action@v1
         with:
           build-dir: build/ai-provider-for-amazee-ai
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ai-provider-for-amazee-ai
           path: build/
