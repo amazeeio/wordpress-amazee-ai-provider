@@ -3,7 +3,7 @@ Contributors: dan2k3k4
 Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
 Tested up to: 7.0
-Stable tag: 1.2.1
+Stable tag: 1.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -31,6 +31,12 @@ Models are dynamically loaded from your active LiteLLM region endpoint.
 - JSON output formatting
 - Tool/function calling
 - Streaming responses
+
+= Image Generation =
+
+Supported in regions whose endpoint offers a model in `image_generation` mode. Such models are detected automatically from the model catalog, no configuration needed. Images are returned inline as base64 data.
+
+Modes other than chat and image generation (embeddings, audio, responses) are not exposed yet.
 
 == External Services ==
 
@@ -82,6 +88,10 @@ Released versions bundle their own autoloader, so there is no build step. Only i
    - Select »Enable Experiments« and Save.
 
 == Changelog ==
+
+= 1.3 =
+* Expose image generation: models the endpoint reports with the `image_generation` mode are now advertised with the image generation capability, so features such as the AI plugin's image generation turn themselves on in regions that offer such a model.
+* Prefer the region's `chat` and `text_to_image` aliases when a feature has no explicit model preference, instead of whichever model the catalog happens to list first.
 
 = 1.2.1 =
 * Rewrite the installation instructions for the WordPress.org release: install from Plugins > Add New, or upload the zip. Composer is now a note for Composer-managed sites rather than the only documented path.

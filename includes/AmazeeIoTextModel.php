@@ -96,17 +96,7 @@ class AmazeeIoTextModel extends AbstractOpenAiCompatibleTextGenerationModel {
 	 * @throws ClientException If the amazee.ai budget has been exceeded.
 	 */
 	protected function throwIfNotSuccessful( Response $response ): void {
-		if ( $response->isSuccessful() ) {
-			return;
-		}
-
-		$data    = $response->getData();
-		$message = is_array( $data ) ? ( $data['error']['message'] ?? '' ) : '';
-		if ( is_string( $message ) && false !== stripos( $message, 'budget has been exceeded' ) ) {
-			throw new ClientException(
-				'Your amazee.ai budget has been exceeded. Review your plan and spend at https://my.amazee.io.'
-			);
-		}
+		AmazeeIoAiProvider::throwOnBudgetError( $response );
 
 		parent::throwIfNotSuccessful( $response );
 	}
