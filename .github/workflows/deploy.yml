@@ -1,6 +1,11 @@
 name: Deploy to WordPress.org
 
 on:
+  # A push to main releases the version in the plugin header once it has no
+  # release yet, so bumping the version is the whole release ritual.
+  push:
+    branches: [main]
+  # A release published by hand still deploys.
   release:
     types: [published]
 
@@ -8,8 +13,50 @@ permissions:
   contents: write
 
 jobs:
-  deploy:
+  # Deciding in a separate job keeps the deploy steps free of skip conditions.
+  version:
     runs-on: ubuntu-latest
+    outputs:
+      # Empty when there is nothing to release.
+      version: ${{ steps.resolve.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Resolve the version to release
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [ -n "$RELEASE_TAG" ]; then
+            echo "version=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # The test suite keeps this in sync with AmazeeIoAiProvider::VERSION
+          # and the readme stable tag, so the header alone is authoritative.
+          version=$(sed -n 's/^ \* Version: *//p' ai-provider-for-amazee-ai.php | tr -d '[:space:]')
+          if [ -z "$version" ]; then
+            echo "No version found in the plugin header." >&2
+            exit 1
+          fi
+
+          if gh release view "$version" >/dev/null 2>&1; then
+            echo "Release $version already exists, nothing to release."
+            exit 0
+          fi
+
+          # Releasing here rather than in a separate workflow on purpose: a
+          # release created with GITHUB_TOKEN does not trigger workflows, so the
+          # deploy has to happen in this run.
+          gh release create "$version" --title "$version" --generate-notes
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: version
+    if: needs.version.outputs.version != ''
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
     steps:
       - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
@@ -26,14 +73,13 @@ jobs:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: ai-provider-for-amazee-ai
       - name: Attach zip to GitHub release
-        run: gh release upload "${{ github.event.release.tag_name }}" "${{ steps.deploy.outputs.zip-path }}"
+        run: gh release upload "$VERSION" "${{ steps.deploy.outputs.zip-path }}"
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Announce release in Slack
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL: C0917Q6J7RS
-          VERSION: ${{ github.event.release.tag_name }}
         run: |
           text="New plugin release: AI Provider for amazee.ai $VERSION - https://wordpress.org/plugins/ai-provider-for-amazee-ai/"
           response=$(curl -sS -X POST https://slack.com/api/chat.postMessage \
