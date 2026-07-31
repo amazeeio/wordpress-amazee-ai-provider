@@ -87,6 +87,10 @@ Released versions bundle their own autoloader, so there is no build step. Only i
    - Navigate to Settings > AI Experiments (`/options-general.php?page=ai-experiments`)
    - Select »Enable Experiments« and Save.
 
+== Screenshots ==
+
+1. The amazee.ai connector in Settings > Connectors, connected and ready to use.
+
 == Changelog ==
 
 = 1.3 =
