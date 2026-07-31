@@ -69,6 +69,11 @@ jobs:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: ai-provider-for-amazee-ai
+          # Copy only the readme and the assets. Without this the action rsyncs
+          # the whole workspace over SVN trunk with --delete, which deletes the
+          # vendor directory this job never builds, and it then dies reverting
+          # what it deleted. Releases are the deploy job's business anyway.
+          IGNORE_OTHER_FILES: true
 
   deploy:
     needs: version
