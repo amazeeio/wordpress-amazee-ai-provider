@@ -42,6 +42,26 @@ class AmazeeIoAiProviderTest extends TestCase {
 		$this->assertEquals( 'core-token', $config['token'] );
 	}
 
+	public function testGetApiConfigurationFromSettingsOption() {
+		$GLOBALS['wp_mock_options']['ai_provider_for_amazee_ai_settings'] = array( 'endpoint_url' => 'https://llm.opt.amazee.ai/v1/' );
+		amazeeio_test_set_credential( 'plain-token' );
+
+		$config = AmazeeIoAiProvider::getApiConfiguration();
+
+		$this->assertEquals( 'https://llm.opt.amazee.ai/v1', $config['url'] );
+		$this->assertEquals( 'plain-token', $config['token'] );
+	}
+
+	public function testSettingsOptionUrlBeatsPipeCredentialUrl() {
+		$GLOBALS['wp_mock_options']['ai_provider_for_amazee_ai_settings'] = array( 'endpoint_url' => 'https://llm.opt.amazee.ai/v1' );
+		amazeeio_test_set_credential( 'https://llm.pipe.amazee.ai/v1|pipe-token' );
+
+		$config = AmazeeIoAiProvider::getApiConfiguration();
+
+		$this->assertEquals( 'https://llm.opt.amazee.ai/v1', $config['url'] );
+		$this->assertEquals( 'pipe-token', $config['token'] );
+	}
+
 	public function testGetApiConfigurationCoreCredentialPlainToken() {
 		amazeeio_test_set_credential( 'just-a-token' );
 

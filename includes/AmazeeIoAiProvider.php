@@ -35,7 +35,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	 *
 	 * Must be kept in sync with the version in the main plugin file.
 	 */
-	public const VERSION = '1.3';
+	public const VERSION = '1.4';
 
 	/**
 	 * Value of the `X-Amazee-Client` header sent with every API request.
@@ -47,6 +47,11 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	/**
 	 * Retrieves the configured endpoint and access token.
 	 *
+	 * The endpoint URL is resolved from the `AMAZEE_ENDPOINT_URL` constant,
+	 * then the Settings > amazee.ai option, then a `url|token` credential.
+	 * The token is resolved from the `AMAZEE_LLM_TOKEN` constant, then the
+	 * credential the AI client holds for this provider.
+	 *
 	 * @return array{url: string, token: string} Configuration array containing url and token keys.
 	 */
 	public static function getApiConfiguration(): array {
@@ -56,8 +61,12 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 		$endpoint_url = is_string( $endpoint_url ) ? trim( $endpoint_url ) : '';
 		$auth_token   = is_string( $auth_token ) ? trim( $auth_token ) : '';
 
+		if ( '' === $endpoint_url ) {
+			$endpoint_url = AmazeeIoSettings::get_endpoint_url();
+		}
+
 		// Fall back to the credential the AI client holds for this provider,
-		// which may carry the endpoint as `url|token`.
+		// which may carry the endpoint as `url|token` (pre-1.4 format).
 		if ( '' === $endpoint_url || '' === $auth_token ) {
 			list( $core_url, $core_token ) = self::parseCredential( self::getClientCredential() );
 			if ( '' === $endpoint_url ) {
@@ -224,7 +233,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 			ProviderTypeEnum::server(),
 			'https://my.amazee.io',
 			RequestAuthenticationMethod::apiKey(),
-			__( 'Secure private AI for your site, hosted by amazee.ai. Copy the endpoint URL from my.amazee.io, add a | pipe, then your token: <endpoint URL>|<token>.', 'ai-provider-for-amazee-ai' ),
+			__( 'Secure private AI for your site, hosted by amazee.ai. Enter your LLM token from my.amazee.io here, and your endpoint URL under Settings > amazee.ai.', 'ai-provider-for-amazee-ai' ),
 			$icon_location
 		);
 	}

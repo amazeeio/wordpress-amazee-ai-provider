@@ -3,7 +3,7 @@ Contributors: dan2k3k4
 Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
 Tested up to: 7.0
-Stable tag: 1.3
+Stable tag: 1.4
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -77,12 +77,13 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 
 1. **Obtain your credentials**:
    - Log into your account at [my.amazee.io](https://my.amazee.io) to obtain your endpoint URL and LLM token.
-2. **Store AI Client Credentials**:
-   - Navigate to Settings > Connectors (`/wp-admin/options-connectors.php`) in WordPress.
-   - Locate the **amazee.ai** connector and enter your credential as `https://llm.<region>.amazee.ai/v1|<token>` (endpoint URL, a pipe, then your LLM token).
-   - Alternatively define `AMAZEE_ENDPOINT_URL` and `AMAZEE_LLM_TOKEN` constants in `wp-config.php` (or set the `AMAZEEIO_API_KEY` environment variable to the `url|token` value) and skip the UI entirely.
-   - Save the settings.
-3. **Enable AI experiments** (optional):
+2. **Set the endpoint URL**:
+   - Navigate to Settings > amazee.ai (`/wp-admin/options-general.php?page=ai-provider-for-amazee-ai`) and enter your endpoint URL.
+3. **Store the LLM token**:
+   - Navigate to Settings > Connectors (`/wp-admin/options-connectors.php`), locate the **amazee.ai** connector and enter your LLM token.
+   - The Settings > amazee.ai screen then shows the connection status and the models available to your account.
+   - Alternatively define `AMAZEE_ENDPOINT_URL` and `AMAZEE_LLM_TOKEN` constants in `wp-config.php` (or set the `AMAZEEIO_API_KEY` environment variable) and skip the UI entirely. The pre-1.4 `url|token` credential format keeps working.
+4. **Enable AI experiments** (optional):
    - To actually use the connector, install and activate the official [AI Experiments](https://wordpress.org/plugins/ai/) plugin.
    - Navigate to Settings > AI Experiments (`/options-general.php?page=ai-experiments`)
    - Select »Enable Experiments« and Save.
@@ -92,6 +93,10 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 1. The amazee.ai connector in Settings > Connectors, connected and ready to use.
 
 == Changelog ==
+
+= 1.4 =
+* New Settings > amazee.ai screen for the endpoint URL, with a connection check listing the models available to your account.
+* The amazee.ai connector on Settings > Connectors now takes the LLM token on its own — no more `url|token` pipe format needed. Existing `url|token` credentials keep working.
 
 = 1.3 =
 * Expose image generation: models the endpoint reports with the `image_generation` mode are now advertised with the image generation capability, so features such as the AI plugin's image generation turn themselves on in regions that offer such a model.
