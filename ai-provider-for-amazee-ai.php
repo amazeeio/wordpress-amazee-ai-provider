@@ -3,7 +3,7 @@
  * Plugin Name: AI Provider for amazee.ai
  * Plugin URI: https://github.com/amazeeio/wordpress-amazee-ai-provider
  * Description: Adds amazee.ai AI hosting to the available AI providers
- * Version: 1.3
+ * Version: 1.4
  * Requires at least: 7.0
  * Requires PHP: 7.4
  * Author: amazee.ai
@@ -111,6 +111,8 @@ function bootstrap(): void {
 	}
 
 	add_action( 'init', __NAMESPACE__ . '\\register_provider' );
+
+	( new AmazeeIoSettings() )->init();
 }
 
 /**
@@ -189,11 +191,9 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap', 20 );
 add_filter(
 	'plugin_action_links_' . plugin_basename( __FILE__ ),
 	function ( array $links ): array {
-		$settings_page_url = 'options-connectors.php';
-
 		$settings_link = sprintf(
 			'<a href="%1$s">%2$s</a>',
-			admin_url( $settings_page_url ),
+			admin_url( 'options-general.php?page=ai-provider-for-amazee-ai' ),
 			esc_html__( 'Settings', 'ai-provider-for-amazee-ai' )
 		);
 
@@ -203,6 +203,6 @@ add_filter(
 	}
 );
 
-// Credentials are managed by the WordPress core Connectors screen
+// The API key is managed by the WordPress core Connectors screen
 // (Settings > Connectors), based on this provider's apiKey authentication
-// metadata.
+// metadata. The endpoint URL is managed on the Settings > amazee.ai screen.

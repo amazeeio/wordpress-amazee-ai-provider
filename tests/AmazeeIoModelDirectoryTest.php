@@ -21,6 +21,15 @@ class AmazeeIoModelDirectoryTest extends TestCase {
 		$GLOBALS['wp_mock_transients'][ AmazeeIoModelDirectory::cacheKey() ] = $data;
 	}
 
+	public function testCachedCatalogDoesNotMaskMissingToken() {
+		amazeeio_test_set_credential( '' );
+		$this->seedModelData( array( array( 'model_name' => 'chat', 'model_info' => array( 'mode' => 'chat' ) ) ) );
+
+		$this->expectException( \WordPress\AiClient\Common\Exception\RuntimeException::class );
+
+		( new AmazeeIoModelDirectory() )->listModelMetadata();
+	}
+
 	public function testCacheKeyVariesWithEndpointUrl() {
 		$keyA = AmazeeIoModelDirectory::cacheKey();
 		amazeeio_test_set_credential( 'https://llm.ch101.amazee.ai/v1|test-token' );

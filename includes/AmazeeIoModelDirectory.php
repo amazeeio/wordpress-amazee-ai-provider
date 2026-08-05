@@ -108,6 +108,11 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 	 * {@inheritDoc}
 	 */
 	protected function sendListModelsRequest(): array {
+		// Resolve authentication before serving the cached catalog: it throws
+		// when no token is configured anywhere, so a stale cache cannot
+		// report the provider as connected after the token was removed.
+		$this->getRequestAuthentication();
+
 		$model_data = get_transient( self::cacheKey() );
 		if ( ! is_array( $model_data ) ) {
 			$model_data = $this->fetchModelData();

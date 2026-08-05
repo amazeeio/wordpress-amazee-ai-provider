@@ -85,6 +85,32 @@ if ( ! function_exists( 'delete_transient' ) ) {
 	}
 }
 
+if ( ! function_exists( 'esc_url_raw' ) ) {
+	function esc_url_raw( $url ) {
+		return $url;
+	}
+}
+
+if ( ! function_exists( 'esc_url' ) ) {
+	function esc_url( $url ) {
+		return $url;
+	}
+}
+
+if ( ! function_exists( 'admin_url' ) ) {
+	function admin_url( $path = '' ) {
+		return 'https://example.com/wp-admin/' . $path;
+	}
+}
+
+$GLOBALS['wp_mock_settings_errors'] = array();
+
+if ( ! function_exists( 'add_settings_error' ) ) {
+	function add_settings_error( $setting, $code, $message, $type = 'error' ) {
+		$GLOBALS['wp_mock_settings_errors'][] = compact( 'setting', 'code', 'message', 'type' );
+	}
+}
+
 if ( ! function_exists( 'wp_get_wp_version' ) ) {
 	function wp_get_wp_version() {
 		return '7.0';

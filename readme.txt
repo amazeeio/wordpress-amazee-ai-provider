@@ -3,7 +3,7 @@ Contributors: dan2k3k4
 Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
 Tested up to: 7.0
-Stable tag: 1.3
+Stable tag: 1.4
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -42,7 +42,7 @@ Modes other than chat and image generation (embeddings, audio, responses) are no
 
 This plugin connects to the amazee.ai API to provide its functionality. It is not usable without an amazee.ai account and credentials.
 
-It connects to the amazee.ai endpoint you configure (for example `https://llm.<region>.amazee.ai/v1`) in two situations:
+It connects to the amazee.ai endpoint you configure (for example `https://llm.<region>.amazee.ai`) in two situations:
 
 * To retrieve the list of AI models available to your account (cached for 12 hours).
 * To send prompts and receive AI generated responses whenever you or a plugin on your site uses the WordPress AI features with amazee.ai selected as provider. The content of the prompt (which may include text you or your users enter) and the chosen model parameters are sent to the endpoint.
@@ -76,13 +76,15 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 = Configuration =
 
 1. **Obtain your credentials**:
-   - Log into your account at [my.amazee.io](https://my.amazee.io) to obtain your endpoint URL and LLM token.
-2. **Store AI Client Credentials**:
-   - Navigate to Settings > Connectors (`/wp-admin/options-connectors.php`) in WordPress.
-   - Locate the **amazee.ai** connector and enter your credential as `https://llm.<region>.amazee.ai/v1|<token>` (endpoint URL, a pipe, then your LLM token).
-   - Alternatively define `AMAZEE_ENDPOINT_URL` and `AMAZEE_LLM_TOKEN` constants in `wp-config.php` (or set the `AMAZEEIO_API_KEY` environment variable to the `url|token` value) and skip the UI entirely.
-   - Save the settings.
-3. **Enable AI experiments** (optional):
+   - Log into your account at [my.amazee.io](https://my.amazee.io) to obtain your endpoint URL and API key.
+2. **Set the endpoint URL**:
+   - Navigate to Settings > amazee.ai (`/wp-admin/options-general.php?page=ai-provider-for-amazee-ai`) and enter your endpoint URL, for example `https://llm.us103.amazee.ai` where `us103` is a US region. Regions are also available in the UK, Germany, Switzerland, Australia and more.
+   - There is no default endpoint: your API key only works with the region it was issued for, so copy the exact URL from my.amazee.io.
+3. **Store the API key**:
+   - Navigate to Settings > Connectors (`/wp-admin/options-connectors.php`), locate the **amazee.ai** connector and enter your API key.
+   - The Settings > amazee.ai screen then shows the connection status and the models available to your account.
+   - Alternatively define `AMAZEE_ENDPOINT_URL` and `AMAZEE_LLM_TOKEN` constants in `wp-config.php` (or set the `AMAZEEIO_API_KEY` environment variable) and skip the UI entirely. The pre-1.4 `url|token` credential format keeps working.
+4. **Enable AI experiments** (optional):
    - To actually use the connector, install and activate the official [AI Experiments](https://wordpress.org/plugins/ai/) plugin.
    - Navigate to Settings > AI Experiments (`/options-general.php?page=ai-experiments`)
    - Select »Enable Experiments« and Save.
@@ -90,8 +92,13 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 == Screenshots ==
 
 1. The amazee.ai connector in Settings > Connectors, connected and ready to use.
+2. The Settings > amazee.ai screen: endpoint URL, connection status and the models available to your account.
 
 == Changelog ==
+
+= 1.4 =
+* New Settings > amazee.ai screen for the endpoint URL, with a connection check listing the models available to your account.
+* The amazee.ai connector on Settings > Connectors now takes the API key on its own — no more `url|token` pipe format needed. Existing `url|token` credentials keep working.
 
 = 1.3 =
 * Expose image generation: models the endpoint reports with the `image_generation` mode are now advertised with the image generation capability, so features such as the AI plugin's image generation turn themselves on in regions that offer such a model.
