@@ -182,7 +182,9 @@ class AmazeeIoSettings {
 					'</code>'
 				);
 				echo '<br>';
-				esc_html_e( 'Regions are also available in the UK, Germany, Switzerland, Australia and more. There is no default: your LLM token only works with the region it was issued for, so copy the exact URL from my.amazee.io.', 'ai-provider-for-amazee-ai' );
+				esc_html_e( 'Regions are also available in the UK, Germany, Switzerland, Australia and more.', 'ai-provider-for-amazee-ai' );
+				echo '<br>';
+				esc_html_e( 'There is no default: your LLM token only works with the region it was issued for, so copy the exact URL from my.amazee.io.', 'ai-provider-for-amazee-ai' );
 			}
 			?>
 		</p>
