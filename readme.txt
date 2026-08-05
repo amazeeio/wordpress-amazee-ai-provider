@@ -92,6 +92,7 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 == Screenshots ==
 
 1. The amazee.ai connector in Settings > Connectors, connected and ready to use.
+2. The Settings > amazee.ai screen: endpoint URL, connection status and the models available to your account.
 
 == Changelog ==
 
