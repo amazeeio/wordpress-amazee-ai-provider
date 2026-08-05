@@ -116,7 +116,7 @@ class AmazeeIoSettings {
 				<?php
 				printf(
 					/* translators: 1: opening link tag to my.amazee.io, 2: closing link tag */
-					esc_html__( 'Copy the endpoint URL and LLM token for your region from %1$smy.amazee.io%2$s.', 'ai-provider-for-amazee-ai' ),
+					esc_html__( 'amazee.ai credentials are managed in the amazee.io dashboard: copy the endpoint URL and LLM token for your region from %1$smy.amazee.io%2$s.', 'ai-provider-for-amazee-ai' ),
 					'<a href="https://my.amazee.io" target="_blank" rel="noopener">',
 					'</a>'
 				);
@@ -161,7 +161,7 @@ class AmazeeIoSettings {
 			name="<?php echo esc_attr( self::OPTION_NAME . '[endpoint_url]' ); ?>"
 			value="<?php echo esc_attr( $constant_set ? $constant_url : self::get_endpoint_url() ); ?>"
 			class="regular-text"
-			placeholder="https://llm.ch101.amazee.ai/v1"
+			placeholder="https://llm.us103.amazee.ai/v1"
 			<?php disabled( $constant_set ); ?>
 		/>
 		<p class="description">
@@ -176,7 +176,7 @@ class AmazeeIoSettings {
 			} else {
 				printf(
 					/* translators: 1: code tag, 2: closing code tag */
-					esc_html__( 'The endpoint URL for your amazee.ai region, for example %1$shttps://llm.<region>.amazee.ai/v1%2$s.', 'ai-provider-for-amazee-ai' ),
+					esc_html__( 'The endpoint URL for your amazee.ai region, for example %1$shttps://llm.us103.amazee.ai/v1%2$s where %1$sus103%2$s is a US region. Regions are also available in the UK, Germany, Switzerland, Australia and more.', 'ai-provider-for-amazee-ai' ),
 					'<code>',
 					'</code>'
 				);

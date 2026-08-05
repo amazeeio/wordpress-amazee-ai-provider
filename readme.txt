@@ -78,7 +78,7 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 1. **Obtain your credentials**:
    - Log into your account at [my.amazee.io](https://my.amazee.io) to obtain your endpoint URL and LLM token.
 2. **Set the endpoint URL**:
-   - Navigate to Settings > amazee.ai (`/wp-admin/options-general.php?page=ai-provider-for-amazee-ai`) and enter your endpoint URL.
+   - Navigate to Settings > amazee.ai (`/wp-admin/options-general.php?page=ai-provider-for-amazee-ai`) and enter your endpoint URL, for example `https://llm.us103.amazee.ai/v1` where `us103` is a US region. Regions are also available in the UK, Germany, Switzerland, Australia and more.
 3. **Store the LLM token**:
    - Navigate to Settings > Connectors (`/wp-admin/options-connectors.php`), locate the **amazee.ai** connector and enter your LLM token.
    - The Settings > amazee.ai screen then shows the connection status and the models available to your account.
