@@ -59,7 +59,7 @@ class AmazeeIoSettings {
 			'<div class="notice notice-info"><p>%s</p></div>',
 			sprintf(
 				/* translators: 1: opening link tag to the amazee.ai settings screen, 2: closing link tag */
-				esc_html__( 'amazee.ai: enter your LLM token below, and set your endpoint URL on the %1$sSettings > amazee.ai%2$s screen.', 'ai-provider-for-amazee-ai' ),
+				esc_html__( 'amazee.ai — Step 1: set your endpoint URL on the %1$sSettings > amazee.ai%2$s screen. Step 2: enter your LLM token on the amazee.ai connector below.', 'ai-provider-for-amazee-ai' ),
 				'<a href="' . esc_url( admin_url( 'options-general.php?page=' . self::PAGE_SLUG ) ) . '">',
 				'</a>'
 			)
@@ -154,9 +154,11 @@ class AmazeeIoSettings {
 			</p>
 			<p>
 				<?php
+				esc_html_e( 'Step 1: enter the endpoint URL below.', 'ai-provider-for-amazee-ai' );
+				echo '<br>';
 				printf(
 					/* translators: 1: opening link tag to the Connectors screen, 2: closing link tag */
-					esc_html__( 'Enter the endpoint URL below, and your LLM token for the amazee.ai connector on the %1$sSettings > Connectors%2$s screen.', 'ai-provider-for-amazee-ai' ),
+					esc_html__( 'Step 2: enter your LLM token for the amazee.ai connector on the %1$sSettings > Connectors%2$s screen.', 'ai-provider-for-amazee-ai' ),
 					'<a href="' . esc_url( admin_url( 'options-connectors.php' ) ) . '">',
 					'</a>'
 				);
