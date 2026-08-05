@@ -152,6 +152,10 @@ class AmazeeIoSettings {
 				);
 				?>
 			</p>
+			<?php
+			$config = AmazeeIoAiProvider::getApiConfiguration();
+			if ( '' === $config['url'] || '' === $config['token'] ) :
+				?>
 			<p>
 				<?php
 				esc_html_e( 'Step 1: enter the endpoint URL below.', 'ai-provider-for-amazee-ai' );
@@ -164,6 +168,7 @@ class AmazeeIoSettings {
 				);
 				?>
 			</p>
+			<?php endif; ?>
 			<form action="options.php" method="post">
 				<?php
 				settings_fields( self::OPTION_GROUP );
