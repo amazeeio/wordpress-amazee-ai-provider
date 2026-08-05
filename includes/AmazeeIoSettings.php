@@ -35,6 +35,36 @@ class AmazeeIoSettings {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'register_settings_screen' ) );
 		add_action( 'admin_notices', array( $this, 'render_connectors_screen_notice' ) );
+		add_action( 'wp_connectors_init', array( $this, 'update_connector_description' ) );
+	}
+
+	/**
+	 * Drops the setup steps from the connector description once configured.
+	 *
+	 * The default description from the provider metadata walks through the
+	 * two setup steps. The connector registry is built on demand and fires
+	 * this action when endpoint URL and token are already resolvable, so the
+	 * steps can be replaced with the plain tagline when both are set.
+	 *
+	 * @param \WP_Connector_Registry $registry Connector registry instance.
+	 */
+	public function update_connector_description( $registry ): void {
+		$config = AmazeeIoAiProvider::getApiConfiguration();
+		if ( '' === $config['url'] || '' === $config['token'] ) {
+			return;
+		}
+
+		if ( ! $registry->is_registered( 'amazeeio' ) ) {
+			return;
+		}
+
+		$connector = $registry->unregister( 'amazeeio' );
+		if ( null === $connector ) {
+			return;
+		}
+
+		$connector['description'] = __( 'Secure private AI for your site, hosted by amazee.ai.', 'ai-provider-for-amazee-ai' );
+		$registry->register( 'amazeeio', $connector );
 	}
 
 	/**
