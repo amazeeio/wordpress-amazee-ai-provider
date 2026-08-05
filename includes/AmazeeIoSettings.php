@@ -275,6 +275,25 @@ class AmazeeIoSettings {
 		</p>
 
 		<?php
+		// Pre-emptive companion to the post-save warning in sanitize_settings().
+		$current_url = $constant_set ? $constant_url : self::get_endpoint_url();
+		if ( '' !== $current_url ) {
+			?>
+			<div class="notice notice-warning notice-alt inline" style="margin:8px 0 0;">
+				<p>
+					<strong><?php esc_html_e( 'Note:', 'ai-provider-for-amazee-ai' ); ?></strong>
+					<?php
+					printf(
+						/* translators: 1: opening link tag to the Connectors screen, 2: closing link tag */
+						esc_html__( 'if you change the region, you will likely need to remove and replace your LLM token on the %1$sSettings > Connectors%2$s screen, as tokens are bound to the region they were issued for.', 'ai-provider-for-amazee-ai' ),
+						'<a href="' . esc_url( admin_url( 'options-connectors.php' ) ) . '">',
+						'</a>'
+					);
+					?>
+				</p>
+			</div>
+			<?php
+		}
 	}
 
 	/**
