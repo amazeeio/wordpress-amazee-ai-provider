@@ -42,7 +42,7 @@ Modes other than chat and image generation (embeddings, audio, responses) are no
 
 This plugin connects to the amazee.ai API to provide its functionality. It is not usable without an amazee.ai account and credentials.
 
-It connects to the amazee.ai endpoint you configure (for example `https://llm.<region>.amazee.ai/v1`) in two situations:
+It connects to the amazee.ai endpoint you configure (for example `https://llm.<region>.amazee.ai`) in two situations:
 
 * To retrieve the list of AI models available to your account (cached for 12 hours).
 * To send prompts and receive AI generated responses whenever you or a plugin on your site uses the WordPress AI features with amazee.ai selected as provider. The content of the prompt (which may include text you or your users enter) and the chosen model parameters are sent to the endpoint.
@@ -78,7 +78,7 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 1. **Obtain your credentials**:
    - Log into your account at [my.amazee.io](https://my.amazee.io) to obtain your endpoint URL and API key.
 2. **Set the endpoint URL**:
-   - Navigate to Settings > amazee.ai (`/wp-admin/options-general.php?page=ai-provider-for-amazee-ai`) and enter your endpoint URL, for example `https://llm.us103.amazee.ai/v1` where `us103` is a US region. Regions are also available in the UK, Germany, Switzerland, Australia and more.
+   - Navigate to Settings > amazee.ai (`/wp-admin/options-general.php?page=ai-provider-for-amazee-ai`) and enter your endpoint URL, for example `https://llm.us103.amazee.ai` where `us103` is a US region. Regions are also available in the UK, Germany, Switzerland, Australia and more.
    - There is no default endpoint: your API key only works with the region it was issued for, so copy the exact URL from my.amazee.io.
 3. **Store the API key**:
    - Navigate to Settings > Connectors (`/wp-admin/options-connectors.php`), locate the **amazee.ai** connector and enter your API key.

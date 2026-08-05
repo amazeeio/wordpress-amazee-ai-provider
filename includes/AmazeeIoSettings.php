@@ -246,7 +246,7 @@ class AmazeeIoSettings {
 			name="<?php echo esc_attr( self::OPTION_NAME . '[endpoint_url]' ); ?>"
 			value="<?php echo esc_attr( $constant_set ? $constant_url : self::get_endpoint_url() ); ?>"
 			class="regular-text"
-			placeholder="https://llm.&lt;region&gt;.amazee.ai/v1"
+			placeholder="https://llm.&lt;region&gt;.amazee.ai"
 			required
 			<?php disabled( $constant_set ); ?>
 		/>
@@ -262,7 +262,7 @@ class AmazeeIoSettings {
 			} else {
 				printf(
 					/* translators: 1: code tag, 2: closing code tag */
-					esc_html__( 'The endpoint URL for your amazee.ai region, for example %1$shttps://llm.us103.amazee.ai/v1%2$s where %1$sus103%2$s is a US region.', 'ai-provider-for-amazee-ai' ),
+					esc_html__( 'The endpoint URL for your amazee.ai region, for example %1$shttps://llm.us103.amazee.ai%2$s where %1$sus103%2$s is a US region.', 'ai-provider-for-amazee-ai' ),
 					'<code>',
 					'</code>'
 				);
