@@ -247,7 +247,10 @@ class AmazeeIoSettings {
 			}
 		}
 
-		$model_ids = array_keys( $models );
+		$model_ids = array();
+		foreach ( $models as $model ) {
+			$model_ids[] = $model->getId();
+		}
 		sort( $model_ids );
 		?>
 
@@ -260,7 +263,6 @@ class AmazeeIoSettings {
 			</thead>
 			<tbody>
 				<?php foreach ( $model_ids as $model_id ) : ?>
-					<?php $model_id = (string) $model_id; // PHP casts numeric string array keys to int. ?>
 					<tr>
 						<td><code><?php echo esc_html( $model_id ); ?></code></td>
 						<td><?php echo esc_html( $descriptions[ $model_id ] ?? '' ); ?></td>
