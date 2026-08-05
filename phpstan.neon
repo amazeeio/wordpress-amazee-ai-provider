@@ -3,5 +3,3 @@ parameters:
 	paths:
 		- includes/
 		- ai-provider-for-amazee-ai.php
-	scanFiles:
-		- tests/stubs/class-wp-connector-registry.php

@@ -35,36 +35,35 @@ class AmazeeIoSettings {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'register_settings_screen' ) );
 		add_action( 'admin_notices', array( $this, 'render_connectors_screen_notice' ) );
-		add_action( 'wp_connectors_init', array( $this, 'update_connector_description' ) );
+		add_filter( 'script_module_data_options-connectors-wp-admin', array( $this, 'update_connector_description' ), 11 );
 	}
 
 	/**
-	 * Drops the setup steps from the connector description once configured.
+	 * Drops the setup steps from the connector card once configured.
 	 *
-	 * The default description from the provider metadata walks through the
-	 * two setup steps. The connector registry is built on demand and fires
-	 * this action when endpoint URL and token are already resolvable, so the
-	 * steps can be replaced with the plain tagline when both are set.
+	 * The provider metadata description walks through the two setup steps.
+	 * The swap cannot happen on `wp_connectors_init`: core builds the
+	 * connector registry on `init` at priority 15 but hands the stored token
+	 * to the AI client only at priority 20, so the token never resolves
+	 * there. This filter runs when the Connectors screen embeds its data,
+	 * well after both.
 	 *
-	 * @param \WP_Connector_Registry $registry Connector registry instance.
+	 * @param mixed $data Script module data for the Connectors screen.
+	 * @return mixed Filtered data.
 	 */
-	public function update_connector_description( $registry ): void {
+	public function update_connector_description( $data ) {
+		if ( ! is_array( $data ) || ! isset( $data['connectors']['amazeeio']['description'] ) ) {
+			return $data;
+		}
+
 		$config = AmazeeIoAiProvider::getApiConfiguration();
 		if ( '' === $config['url'] || '' === $config['token'] ) {
-			return;
+			return $data;
 		}
 
-		if ( ! $registry->is_registered( 'amazeeio' ) ) {
-			return;
-		}
+		$data['connectors']['amazeeio']['description'] = __( 'Secure private AI for your site, hosted by amazee.ai.', 'ai-provider-for-amazee-ai' );
 
-		$connector = $registry->unregister( 'amazeeio' );
-		if ( null === $connector ) {
-			return;
-		}
-
-		$connector['description'] = __( 'Secure private AI for your site, hosted by amazee.ai.', 'ai-provider-for-amazee-ai' );
-		$registry->register( 'amazeeio', $connector );
+		return $data;
 	}
 
 	/**
@@ -154,6 +153,25 @@ class AmazeeIoSettings {
 		$endpoint_url = isset( $value['endpoint_url'] ) ? trim( (string) $value['endpoint_url'] ) : '';
 		if ( '' !== $endpoint_url ) {
 			$endpoint_url = rtrim( esc_url_raw( $endpoint_url ), '/' );
+		}
+
+		// Tokens are bound to the region endpoint they were issued for, so a
+		// changed URL almost always needs a new token as well. The function
+		// guard keeps non-admin contexts (wp-cli, front end) from fataling,
+		// as add_settings_error() only exists in the admin.
+		$previous = self::get_endpoint_url();
+		if ( '' !== $previous && $previous !== $endpoint_url && function_exists( 'add_settings_error' ) ) {
+			add_settings_error(
+				self::OPTION_NAME,
+				'amazee_endpoint_url_changed',
+				sprintf(
+					/* translators: 1: opening link tag to the Connectors screen, 2: closing link tag */
+					__( 'The endpoint URL changed. amazee.ai LLM tokens are bound to the region they were issued for, so you most likely need to update the token on the %1$sSettings > Connectors%2$s screen as well.', 'ai-provider-for-amazee-ai' ),
+					'<a href="' . esc_url( admin_url( 'options-connectors.php' ) ) . '">',
+					'</a>'
+				),
+				'warning'
+			);
 		}
 
 		return array(
