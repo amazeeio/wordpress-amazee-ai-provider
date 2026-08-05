@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Settings > amazee.ai screen for configuring the endpoint URL.
  *
- * The LLM token itself stays on the core Settings > Connectors screen, where
+ * The API key itself stays on the core Settings > Connectors screen, where
  * the AI client stores and resolves it. This screen only manages the endpoint
  * URL and shows whether the connection works.
  */
@@ -88,7 +88,7 @@ class AmazeeIoSettings {
 			'<div class="notice notice-info"><p>%s</p></div>',
 			sprintf(
 				/* translators: 1: opening link tag to the amazee.ai settings screen, 2: closing link tag */
-				esc_html__( 'amazee.ai — Step 1: set your endpoint URL on the %1$sSettings > amazee.ai%2$s screen. Step 2: enter your LLM token on the amazee.ai connector below.', 'ai-provider-for-amazee-ai' ),
+				esc_html__( 'amazee.ai — Step 1: set your endpoint URL on the %1$sSettings > amazee.ai%2$s screen. Step 2: enter your API key on the amazee.ai connector below.', 'ai-provider-for-amazee-ai' ),
 				'<a href="' . esc_url( admin_url( 'options-general.php?page=' . self::PAGE_SLUG ) ) . '">',
 				'</a>'
 			)
@@ -166,7 +166,7 @@ class AmazeeIoSettings {
 				'amazee_endpoint_url_changed',
 				sprintf(
 					/* translators: 1: opening link tag to the Connectors screen, 2: closing link tag */
-					__( 'The endpoint URL changed. amazee.ai LLM tokens are bound to the region they were issued for, so you most likely need to update the token on the %1$sSettings > Connectors%2$s screen as well.', 'ai-provider-for-amazee-ai' ),
+					__( 'The endpoint URL changed. amazee.ai API keys are bound to the region they were issued for, so you most likely need to update the key on the %1$sSettings > Connectors%2$s screen as well.', 'ai-provider-for-amazee-ai' ),
 					'<a href="' . esc_url( admin_url( 'options-connectors.php' ) ) . '">',
 					'</a>'
 				),
@@ -194,7 +194,7 @@ class AmazeeIoSettings {
 				<?php
 				printf(
 					/* translators: 1: opening link tag to my.amazee.io, 2: closing link tag */
-					esc_html__( 'amazee.ai credentials are managed in the amazee.io dashboard: copy the endpoint URL and LLM token for your region from %1$smy.amazee.io%2$s.', 'ai-provider-for-amazee-ai' ),
+					esc_html__( 'amazee.ai credentials are managed in the amazee.io dashboard: copy the endpoint URL and API key for your region from %1$smy.amazee.io%2$s.', 'ai-provider-for-amazee-ai' ),
 					'<a href="https://my.amazee.io" target="_blank" rel="noopener">',
 					'</a>'
 				);
@@ -210,7 +210,7 @@ class AmazeeIoSettings {
 				echo '<br>';
 				printf(
 					/* translators: 1: opening link tag to the Connectors screen, 2: closing link tag */
-					esc_html__( 'Step 2: enter your LLM token for the amazee.ai connector on the %1$sSettings > Connectors%2$s screen.', 'ai-provider-for-amazee-ai' ),
+					esc_html__( 'Step 2: enter your API key for the amazee.ai connector on the %1$sSettings > Connectors%2$s screen.', 'ai-provider-for-amazee-ai' ),
 					'<a href="' . esc_url( admin_url( 'options-connectors.php' ) ) . '">',
 					'</a>'
 				);
@@ -269,7 +269,7 @@ class AmazeeIoSettings {
 				echo '<br>';
 				esc_html_e( 'Regions are also available in the UK, Germany, Switzerland, Australia and more.', 'ai-provider-for-amazee-ai' );
 				echo '<br>';
-				esc_html_e( 'There is no default: your LLM token only works with the region it was issued for, so copy the exact URL from my.amazee.io.', 'ai-provider-for-amazee-ai' );
+				esc_html_e( 'There is no default: your API key only works with the region it was issued for, so copy the exact URL from my.amazee.io.', 'ai-provider-for-amazee-ai' );
 			}
 			?>
 		</p>
@@ -285,7 +285,7 @@ class AmazeeIoSettings {
 					<?php
 					printf(
 						/* translators: 1: opening link tag to the Connectors screen, 2: closing link tag */
-						esc_html__( 'if you change the region, you will likely need to remove and replace your LLM token on the %1$sSettings > Connectors%2$s screen, as tokens are bound to the region they were issued for.', 'ai-provider-for-amazee-ai' ),
+						esc_html__( 'if you change the region, you will likely need to remove and replace your API key on the %1$sSettings > Connectors%2$s screen, as keys are bound to the region they were issued for.', 'ai-provider-for-amazee-ai' ),
 						'<a href="' . esc_url( admin_url( 'options-connectors.php' ) ) . '">',
 						'</a>'
 					);
@@ -308,7 +308,7 @@ class AmazeeIoSettings {
 		if ( '' === $config['url'] || '' === $config['token'] ) {
 			printf(
 				'<p>%s</p>',
-				esc_html__( 'Not connected yet: enter the endpoint URL and LLM token first.', 'ai-provider-for-amazee-ai' )
+				esc_html__( 'Not connected yet: enter the endpoint URL and API key first.', 'ai-provider-for-amazee-ai' )
 			);
 			return;
 		}

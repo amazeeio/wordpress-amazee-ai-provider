@@ -203,6 +203,6 @@ add_filter(
 	}
 );
 
-// The LLM token is managed by the WordPress core Connectors screen
+// The API key is managed by the WordPress core Connectors screen
 // (Settings > Connectors), based on this provider's apiKey authentication
 // metadata. The endpoint URL is managed on the Settings > amazee.ai screen.

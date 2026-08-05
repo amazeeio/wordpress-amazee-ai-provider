@@ -76,12 +76,12 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 = Configuration =
 
 1. **Obtain your credentials**:
-   - Log into your account at [my.amazee.io](https://my.amazee.io) to obtain your endpoint URL and LLM token.
+   - Log into your account at [my.amazee.io](https://my.amazee.io) to obtain your endpoint URL and API key.
 2. **Set the endpoint URL**:
    - Navigate to Settings > amazee.ai (`/wp-admin/options-general.php?page=ai-provider-for-amazee-ai`) and enter your endpoint URL, for example `https://llm.us103.amazee.ai/v1` where `us103` is a US region. Regions are also available in the UK, Germany, Switzerland, Australia and more.
-   - There is no default endpoint: your LLM token only works with the region it was issued for, so copy the exact URL from my.amazee.io.
-3. **Store the LLM token**:
-   - Navigate to Settings > Connectors (`/wp-admin/options-connectors.php`), locate the **amazee.ai** connector and enter your LLM token.
+   - There is no default endpoint: your API key only works with the region it was issued for, so copy the exact URL from my.amazee.io.
+3. **Store the API key**:
+   - Navigate to Settings > Connectors (`/wp-admin/options-connectors.php`), locate the **amazee.ai** connector and enter your API key.
    - The Settings > amazee.ai screen then shows the connection status and the models available to your account.
    - Alternatively define `AMAZEE_ENDPOINT_URL` and `AMAZEE_LLM_TOKEN` constants in `wp-config.php` (or set the `AMAZEEIO_API_KEY` environment variable) and skip the UI entirely. The pre-1.4 `url|token` credential format keeps working.
 4. **Enable AI experiments** (optional):
@@ -97,7 +97,7 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 
 = 1.4 =
 * New Settings > amazee.ai screen for the endpoint URL, with a connection check listing the models available to your account.
-* The amazee.ai connector on Settings > Connectors now takes the LLM token on its own — no more `url|token` pipe format needed. Existing `url|token` credentials keep working.
+* The amazee.ai connector on Settings > Connectors now takes the API key on its own — no more `url|token` pipe format needed. Existing `url|token` credentials keep working.
 
 = 1.3 =
 * Expose image generation: models the endpoint reports with the `image_generation` mode are now advertised with the image generation capability, so features such as the AI plugin's image generation turn themselves on in regions that offer such a model.

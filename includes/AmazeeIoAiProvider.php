@@ -152,7 +152,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 
 		$config = static::getApiConfiguration();
 		if ( empty( $config['token'] ) ) {
-			throw new RuntimeException( 'The amazee.ai LLM token is not configured.' );
+			throw new RuntimeException( 'The amazee.ai API key is not configured.' );
 		}
 		return new ApiKeyRequestAuthentication( $config['token'] );
 	}
@@ -233,7 +233,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 			ProviderTypeEnum::server(),
 			'https://my.amazee.io',
 			RequestAuthenticationMethod::apiKey(),
-			__( 'Secure private AI for your site, hosted by amazee.ai. Step 1: set your endpoint URL under Settings > amazee.ai. Step 2: enter your LLM token from my.amazee.io here.', 'ai-provider-for-amazee-ai' ),
+			__( 'Secure private AI for your site, hosted by amazee.ai. Step 1: set your endpoint URL under Settings > amazee.ai. Step 2: enter your API key from my.amazee.io here.', 'ai-provider-for-amazee-ai' ),
 			$icon_location
 		);
 	}
