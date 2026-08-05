@@ -34,6 +34,36 @@ class AmazeeIoSettings {
 	public function init(): void {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'register_settings_screen' ) );
+		add_action( 'admin_notices', array( $this, 'render_connectors_screen_notice' ) );
+	}
+
+	/**
+	 * Points to the settings screen from the Connectors screen while the
+	 * endpoint URL is missing.
+	 *
+	 * The connector card itself cannot link anywhere: core renders the
+	 * description as escaped plain text, so a notice is the only place on
+	 * that screen a link to the settings screen can live.
+	 */
+	public function render_connectors_screen_notice(): void {
+		if ( 'options-connectors.php' !== $GLOBALS['pagenow'] || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$config = AmazeeIoAiProvider::getApiConfiguration();
+		if ( '' !== $config['url'] ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-info"><p>%s</p></div>',
+			sprintf(
+				/* translators: 1: opening link tag to the amazee.ai settings screen, 2: closing link tag */
+				esc_html__( 'amazee.ai: enter your LLM token below, and set your endpoint URL on the %1$sSettings > amazee.ai%2$s screen.', 'ai-provider-for-amazee-ai' ),
+				'<a href="' . esc_url( admin_url( 'options-general.php?page=' . self::PAGE_SLUG ) ) . '">',
+				'</a>'
+			)
+		);
 	}
 
 	/**
