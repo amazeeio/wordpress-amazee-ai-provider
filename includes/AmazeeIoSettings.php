@@ -176,10 +176,12 @@ class AmazeeIoSettings {
 			} else {
 				printf(
 					/* translators: 1: code tag, 2: closing code tag */
-					esc_html__( 'The endpoint URL for your amazee.ai region, for example %1$shttps://llm.us103.amazee.ai/v1%2$s where %1$sus103%2$s is a US region. Regions are also available in the UK, Germany, Switzerland, Australia and more.', 'ai-provider-for-amazee-ai' ),
+					esc_html__( 'The endpoint URL for your amazee.ai region, for example %1$shttps://llm.us103.amazee.ai/v1%2$s where %1$sus103%2$s is a US region.', 'ai-provider-for-amazee-ai' ),
 					'<code>',
 					'</code>'
 				);
+				echo '<br>';
+				esc_html_e( 'Regions are also available in the UK, Germany, Switzerland, Australia and more.', 'ai-provider-for-amazee-ai' );
 			}
 			?>
 		</p>
@@ -229,11 +231,45 @@ class AmazeeIoSettings {
 			)
 		);
 
-		echo '<ul style="list-style:disc;padding-left:1.5em;">';
-		foreach ( $models as $model ) {
-			printf( '<li><code>%s</code></li>', esc_html( $model->getId() ) );
+		// The endpoint describes models in `model_info.metadata`, which the
+		// model directory caches raw in its transient but does not expose via
+		// ModelMetadata, so read the descriptions from the cache directly.
+		$descriptions = array();
+		$model_data   = get_transient( AmazeeIoModelDirectory::cacheKey() );
+		if ( is_array( $model_data ) ) {
+			foreach ( $model_data as $info_node ) {
+				if ( ! is_array( $info_node ) || ! isset( $info_node['model_name'] ) ) {
+					continue;
+				}
+				$metadata = $info_node['model_info']['metadata'] ?? '';
+
+				$descriptions[ $info_node['model_name'] ] = is_string( $metadata ) ? $metadata : '';
+			}
 		}
-		echo '</ul>';
+
+		$model_ids = array_keys( $models );
+		sort( $model_ids );
+		?>
+
+		<table class="widefat striped" style="max-width:800px;">
+			<thead>
+				<tr>
+					<th scope="col"><?php esc_html_e( 'Model', 'ai-provider-for-amazee-ai' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Description', 'ai-provider-for-amazee-ai' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ( $model_ids as $model_id ) : ?>
+					<?php $model_id = (string) $model_id; // PHP casts numeric string array keys to int. ?>
+					<tr>
+						<td><code><?php echo esc_html( $model_id ); ?></code></td>
+						<td><?php echo esc_html( $descriptions[ $model_id ] ?? '' ); ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+
+		<?php
 	}
 
 	/**
