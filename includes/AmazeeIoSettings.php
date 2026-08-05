@@ -161,7 +161,8 @@ class AmazeeIoSettings {
 			name="<?php echo esc_attr( self::OPTION_NAME . '[endpoint_url]' ); ?>"
 			value="<?php echo esc_attr( $constant_set ? $constant_url : self::get_endpoint_url() ); ?>"
 			class="regular-text"
-			placeholder="https://llm.us103.amazee.ai/v1"
+			placeholder="https://llm.&lt;region&gt;.amazee.ai/v1"
+			required
 			<?php disabled( $constant_set ); ?>
 		/>
 		<p class="description">
@@ -181,7 +182,7 @@ class AmazeeIoSettings {
 					'</code>'
 				);
 				echo '<br>';
-				esc_html_e( 'Regions are also available in the UK, Germany, Switzerland, Australia and more.', 'ai-provider-for-amazee-ai' );
+				esc_html_e( 'Regions are also available in the UK, Germany, Switzerland, Australia and more. There is no default: your LLM token only works with the region it was issued for, so copy the exact URL from my.amazee.io.', 'ai-provider-for-amazee-ai' );
 			}
 			?>
 		</p>
