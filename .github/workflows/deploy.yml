@@ -102,7 +102,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - name: Announce release in Slack
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.AMAZEE_AI_SLACK_BOT_TOKEN }}
           SLACK_CHANNEL: C0917Q6J7RS
         run: |
           text="New plugin release: AI Provider for amazee.ai $VERSION - https://wordpress.org/plugins/ai-provider-for-amazee-ai/"
