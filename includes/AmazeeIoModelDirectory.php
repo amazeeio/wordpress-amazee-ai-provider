@@ -17,6 +17,7 @@ use WordPress\AiClient\Providers\Http\DTO\Response;
 use WordPress\AiClient\Providers\Http\Enums\HttpMethodEnum;
 use WordPress\AiClient\Providers\Models\DTO\ModelMetadata;
 use WordPress\AiClient\Providers\Models\DTO\SupportedOption;
+use WordPress\AiClient\Providers\Models\EmbeddingGeneration\Contracts\EmbeddingGenerationModelInterface;
 use WordPress\AiClient\Providers\Models\Enums\CapabilityEnum;
 use WordPress\AiClient\Providers\Models\Enums\OptionEnum;
 use WordPress\AiClient\Providers\OpenAiCompatibleImplementation\AbstractOpenAiCompatibleModelMetadataDirectory;
@@ -178,9 +179,18 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 			return self::imageModelMetadata( $id );
 		}
 
-		// ponytail: other modes (embedding, audio_transcription, responses, …)
-		// need model classes the AI client has no OpenAI-compatible base class
-		// for; add a branch here once it ships one.
+		// Embedding support ships with php-ai-client 1.4, or with the AI
+		// plugin's SDK overlay on cores bundling an older client.
+		if ( 'embedding' === $mode && interface_exists( EmbeddingGenerationModelInterface::class ) ) {
+			return self::embeddingModelMetadata( $id );
+		}
+
+		if ( 'audio_speech' === $mode ) {
+			return self::speechModelMetadata( $id );
+		}
+
+		// ponytail: audio_transcription and other modes have no AI client
+		// capability yet; add a branch here once one ships.
 		if ( 'chat' !== $mode ) {
 			return null;
 		}
@@ -240,6 +250,39 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 		);
 
 		return new ModelMetadata( $id, $id, array( CapabilityEnum::imageGeneration() ), $options );
+	}
+
+	/**
+	 * Builds metadata for a model the endpoint reports as `embedding`.
+	 *
+	 * @param string $id Model identifier.
+	 */
+	private static function embeddingModelMetadata( string $id ): ModelMetadata {
+		$options = array(
+			new SupportedOption( OptionEnum::inputModalities(), array( array( ModalityEnum::text() ) ) ),
+			new SupportedOption( OptionEnum::dimensions() ),
+			new SupportedOption( OptionEnum::customOptions() ),
+		);
+
+		return new ModelMetadata( $id, $id, array( CapabilityEnum::embeddingGeneration() ), $options );
+	}
+
+	/**
+	 * Builds metadata for a model the endpoint reports as `audio_speech`.
+	 *
+	 * @param string $id Model identifier.
+	 */
+	private static function speechModelMetadata( string $id ): ModelMetadata {
+		$options = array(
+			new SupportedOption( OptionEnum::inputModalities(), array( array( ModalityEnum::text() ) ) ),
+			new SupportedOption( OptionEnum::outputModalities(), array( array( ModalityEnum::audio() ) ) ),
+			new SupportedOption( OptionEnum::outputMimeType(), array_keys( AmazeeIoSpeechModel::FORMATS ) ),
+			new SupportedOption( OptionEnum::outputFileType(), array( FileTypeEnum::inline() ) ),
+			new SupportedOption( OptionEnum::outputSpeechVoice() ),
+			new SupportedOption( OptionEnum::customOptions() ),
+		);
+
+		return new ModelMetadata( $id, $id, array( CapabilityEnum::textToSpeechConversion() ), $options );
 	}
 
 	/**

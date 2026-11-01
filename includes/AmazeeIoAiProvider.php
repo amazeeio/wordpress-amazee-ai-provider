@@ -35,7 +35,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	 *
 	 * Must be kept in sync with the version in the main plugin file.
 	 */
-	public const VERSION = '1.4';
+	public const VERSION = '1.5';
 
 	/**
 	 * Value of the `X-Amazee-Client` header sent with every API request.
@@ -210,6 +210,12 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 			}
 			if ( $cap->isImageGeneration() ) {
 				return new AmazeeIoImageModel( $model_metadata, $provider_metadata );
+			}
+			if ( $cap->isEmbeddingGeneration() ) {
+				return new AmazeeIoEmbeddingModel( $model_metadata, $provider_metadata );
+			}
+			if ( $cap->isTextToSpeechConversion() ) {
+				return new AmazeeIoSpeechModel( $model_metadata, $provider_metadata );
 			}
 		}
 

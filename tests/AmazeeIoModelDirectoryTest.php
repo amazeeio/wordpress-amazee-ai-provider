@@ -105,6 +105,14 @@ class AmazeeIoModelDirectoryTest extends TestCase {
 					'model_name' => 'embedding-model',
 					'model_info' => array( 'mode' => 'embedding' ),
 				),
+				array(
+					'model_name' => 'tts-model',
+					'model_info' => array( 'mode' => 'audio_speech' ),
+				),
+				array(
+					'model_name' => 'whisper',
+					'model_info' => array( 'mode' => 'audio_transcription' ),
+				),
 				array( 'not-a-model-node' ),
 			)
 		);
@@ -112,8 +120,9 @@ class AmazeeIoModelDirectoryTest extends TestCase {
 		$list = $this->listModelMetadataFromCache();
 
 		// Modes without a model class stay unexposed.
-		$this->assertCount( 1, $list );
-		$this->assertArrayHasKey( 'chat-model', $list );
+		$this->assertSame( array( 'chat-model', 'embedding-model', 'tts-model' ), array_keys( $list ) );
+		$this->assertSame( array( 'embedding_generation' ), array_map( 'strval', $list['embedding-model']->getSupportedCapabilities() ) );
+		$this->assertSame( array( 'text_to_speech_conversion' ), array_map( 'strval', $list['tts-model']->getSupportedCapabilities() ) );
 
 		$capabilities = array_map( 'strval', $list['chat-model']->getSupportedCapabilities() );
 		$this->assertContains( 'text_generation', $capabilities );

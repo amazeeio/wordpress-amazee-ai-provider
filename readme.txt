@@ -3,7 +3,7 @@ Contributors: dan2k3k4
 Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
 Tested up to: 7.1
-Stable tag: 1.4
+Stable tag: 1.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -36,7 +36,15 @@ Models are dynamically loaded from your active LiteLLM region endpoint.
 
 Supported in regions whose endpoint offers a model in `image_generation` mode. Such models are detected automatically from the model catalog, no configuration needed. Images are returned inline as base64 data.
 
-Modes other than chat and image generation (embeddings, audio, responses) are not exposed yet.
+= Embeddings =
+
+Models in `embedding` mode are exposed for embedding generation, used by the AI plugin's embedding sync and semantic features. Requires WordPress AI plugin 1.5+ (or php-ai-client 1.4+), which provides the embedding API.
+
+= Text to Speech =
+
+Models in `audio_speech` mode are exposed for text-to-speech conversion, used by the AI plugin's Text to Speech experiment. Audio is returned inline as MP3, Opus, WAV, FLAC or AAC.
+
+Other modes (audio transcription, responses) are not exposed yet.
 
 == External Services ==
 
@@ -95,6 +103,10 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 2. The Settings > amazee.ai screen: endpoint URL, connection status and the models available to your account.
 
 == Changelog ==
+
+= 1.5 =
+* Embedding generation: models the endpoint reports in `embedding` mode are exposed with the embedding generation capability (php-ai-client 1.4+ or the WordPress AI plugin 1.5 SDK overlay).
+* Text to speech: models in `audio_speech` mode are exposed with the text-to-speech capability, so the AI plugin's Text to Speech experiment turns itself on in regions that offer such a model.
 
 = 1.4 =
 * New Settings > amazee.ai screen for the endpoint URL, with a connection check listing the models available to your account.
