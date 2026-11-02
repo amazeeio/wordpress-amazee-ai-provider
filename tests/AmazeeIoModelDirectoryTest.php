@@ -105,6 +105,14 @@ class AmazeeIoModelDirectoryTest extends TestCase {
 					'model_name' => 'embedding-model',
 					'model_info' => array( 'mode' => 'embedding' ),
 				),
+				array(
+					'model_name' => 'tts-model',
+					'model_info' => array( 'mode' => 'audio_speech' ),
+				),
+				array(
+					'model_name' => 'whisper',
+					'model_info' => array( 'mode' => 'audio_transcription' ),
+				),
 				array( 'not-a-model-node' ),
 			)
 		);
@@ -112,8 +120,9 @@ class AmazeeIoModelDirectoryTest extends TestCase {
 		$list = $this->listModelMetadataFromCache();
 
 		// Modes without a model class stay unexposed.
-		$this->assertCount( 1, $list );
-		$this->assertArrayHasKey( 'chat-model', $list );
+		$this->assertSame( array( 'chat-model', 'embedding-model', 'tts-model' ), array_keys( $list ) );
+		$this->assertSame( array( 'embedding_generation' ), array_map( 'strval', $list['embedding-model']->getSupportedCapabilities() ) );
+		$this->assertSame( array( 'text_to_speech_conversion' ), array_map( 'strval', $list['tts-model']->getSupportedCapabilities() ) );
 
 		$capabilities = array_map( 'strval', $list['chat-model']->getSupportedCapabilities() );
 		$this->assertContains( 'text_generation', $capabilities );
@@ -159,5 +168,42 @@ class AmazeeIoModelDirectoryTest extends TestCase {
 		);
 		$this->assertTrue( $options[ OptionEnum::outputFileType()->value ]->isSupportedValue( FileTypeEnum::inline() ) );
 		$this->assertTrue( $options[ OptionEnum::outputModalities()->value ]->isSupportedValue( array( ModalityEnum::image() ) ) );
+	}
+
+	public function testInputModalitiesFollowReportedFlags() {
+		$this->seedModelData(
+			array(
+				array( 'model_name' => 'plain', 'model_info' => array( 'mode' => 'chat' ) ),
+				array( 'model_name' => 'audio', 'model_info' => array( 'mode' => 'chat', 'supports_audio_input' => true ) ),
+				array(
+					'model_name' => 'omni',
+					'model_info' => array(
+						'mode'                 => 'chat',
+						'supports_vision'      => true,
+						'supports_audio_input' => true,
+					),
+				),
+			)
+		);
+
+		$list   = $this->listModelMetadataFromCache();
+		$inputs = function ( string $id ) use ( $list ) {
+			foreach ( $list[ $id ]->getSupportedOptions() as $option ) {
+				if ( $option->getName()->isInputModalities() ) {
+					return $option;
+				}
+			}
+			$this->fail( "No input modalities for $id" );
+		};
+
+		$text  = ModalityEnum::text();
+		$image = ModalityEnum::image();
+		$audio = ModalityEnum::audio();
+
+		$this->assertFalse( $inputs( 'plain' )->isSupportedValue( array( $text, $audio ) ) );
+		$this->assertTrue( $inputs( 'audio' )->isSupportedValue( array( $text, $audio ) ) );
+		$this->assertFalse( $inputs( 'audio' )->isSupportedValue( array( $text, $image ) ) );
+		$this->assertTrue( $inputs( 'omni' )->isSupportedValue( array( $text, $image, $audio ) ) );
+		$this->assertTrue( $inputs( 'omni' )->isSupportedValue( array( $text, $audio ) ) );
 	}
 }

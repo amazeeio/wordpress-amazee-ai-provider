@@ -35,7 +35,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	 *
 	 * Must be kept in sync with the version in the main plugin file.
 	 */
-	public const VERSION = '1.4';
+	public const VERSION = '1.5';
 
 	/**
 	 * Value of the `X-Amazee-Client` header sent with every API request.
@@ -182,14 +182,30 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @throws RuntimeException If no API URL is configured.
+	 * Every request resolves its URL here, so this is where plain `http` is
+	 * refused, whichever source (constant, option, credential) set the URL:
+	 * the API key travels with each request.
+	 *
+	 * @throws RuntimeException If no API URL is configured or it is not https.
 	 */
 	protected static function baseUrl(): string {
 		$config = static::getApiConfiguration();
 		if ( empty( $config['url'] ) ) {
 			throw new RuntimeException( 'The amazee.ai API URL is not configured.' );
 		}
+		if ( ! self::isHttpsUrl( $config['url'] ) ) {
+			throw new RuntimeException( 'The amazee.ai endpoint URL must start with https://.' );
+		}
 		return $config['url'];
+	}
+
+	/**
+	 * Whether a URL uses https.
+	 *
+	 * @param string $url URL to check.
+	 */
+	public static function isHttpsUrl( string $url ): bool {
+		return 0 === stripos( $url, 'https://' );
 	}
 
 	/**
@@ -210,6 +226,12 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 			}
 			if ( $cap->isImageGeneration() ) {
 				return new AmazeeIoImageModel( $model_metadata, $provider_metadata );
+			}
+			if ( $cap->isEmbeddingGeneration() ) {
+				return new AmazeeIoEmbeddingModel( $model_metadata, $provider_metadata );
+			}
+			if ( $cap->isTextToSpeechConversion() ) {
+				return new AmazeeIoSpeechModel( $model_metadata, $provider_metadata );
 			}
 		}
 

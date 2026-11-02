@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Amazee\AiProvider;
 
+use WordPress\AiClient\Providers\Models\DTO\ModelMetadata;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -155,6 +157,19 @@ class AmazeeIoSettings {
 			$endpoint_url = rtrim( esc_url_raw( $endpoint_url ), '/' );
 		}
 
+		// The API key is sent with every request, so never store a URL that
+		// would send it unencrypted; keep the previous value instead.
+		if ( '' !== $endpoint_url && ! AmazeeIoAiProvider::isHttpsUrl( $endpoint_url ) ) {
+			if ( function_exists( 'add_settings_error' ) ) {
+				add_settings_error(
+					self::OPTION_NAME,
+					'amazee_endpoint_url_insecure',
+					__( 'The endpoint URL must start with https:// so your API key is never sent unencrypted. The previous URL was kept.', 'ai-provider-for-amazee-ai' )
+				);
+			}
+			return array( 'endpoint_url' => self::get_endpoint_url() );
+		}
+
 		// Tokens are bound to the region endpoint they were issued for, so a
 		// changed URL almost always needs a new token as well. The function
 		// guard keeps non-admin contexts (wp-cli, front end) from fataling,
@@ -196,7 +211,7 @@ class AmazeeIoSettings {
 					/* translators: 1: opening link tag to my.amazee.io, 2: closing link tag */
 					esc_html__( 'amazee.ai credentials are managed in the amazee.io dashboard: copy the endpoint URL and API key for your region from %1$smy.amazee.io%2$s.', 'ai-provider-for-amazee-ai' ),
 					'<a href="https://my.amazee.io" target="_blank" rel="noopener">',
-					'</a>'
+					'<span class="screen-reader-text"> ' . esc_html__( '(opens in a new tab)', 'ai-provider-for-amazee-ai' ) . '</span></a>'
 				);
 				?>
 			</p>
@@ -247,10 +262,12 @@ class AmazeeIoSettings {
 			value="<?php echo esc_attr( $constant_set ? $constant_url : self::get_endpoint_url() ); ?>"
 			class="regular-text"
 			placeholder="https://llm.&lt;region&gt;.amazee.ai"
+			pattern="[Hh][Tt][Tt][Pp][Ss]://.+"
+			aria-describedby="<?php echo esc_attr( self::OPTION_NAME . '-endpoint-url-description' ); ?>"
 			required
 			<?php disabled( $constant_set ); ?>
 		/>
-		<p class="description">
+		<p class="description" id="<?php echo esc_attr( self::OPTION_NAME . '-endpoint-url-description' ); ?>">
 			<?php
 			if ( $constant_set ) {
 				printf(
@@ -317,7 +334,7 @@ class AmazeeIoSettings {
 			$models = AmazeeIoAiProvider::modelMetadataDirectory()->listModelMetadata();
 		} catch ( \Throwable $exception ) {
 			printf(
-				'<p style="color:#d63638;">%s</p>',
+				'<div class="notice notice-error inline"><p>%s</p></div>',
 				sprintf(
 					/* translators: %s: error message returned by the API */
 					esc_html__( 'Could not connect: %s', 'ai-provider-for-amazee-ai' ),
@@ -327,8 +344,10 @@ class AmazeeIoSettings {
 			return;
 		}
 
+		// Core notice styles instead of coloured text: the old green
+		// (#00a32a on white) failed WCAG AA contrast for body text.
 		printf(
-			'<p style="color:#00a32a;">%s</p>',
+			'<div class="notice notice-success inline"><p>%s</p></div>',
 			esc_html(
 				sprintf(
 					/* translators: %d: number of models */
@@ -354,24 +373,26 @@ class AmazeeIoSettings {
 			}
 		}
 
-		$model_ids = array();
+		$model_capabilities = array();
 		foreach ( $models as $model ) {
-			$model_ids[] = $model->getId();
+			$model_capabilities[ $model->getId() ] = implode( ', ', self::capability_labels( $model ) );
 		}
-		sort( $model_ids );
+		ksort( $model_capabilities );
 		?>
 
 		<table class="widefat striped" style="max-width:800px;">
 			<thead>
 				<tr>
 					<th scope="col"><?php esc_html_e( 'Model', 'ai-provider-for-amazee-ai' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Capabilities', 'ai-provider-for-amazee-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Description', 'ai-provider-for-amazee-ai' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ( $model_ids as $model_id ) : ?>
+				<?php foreach ( $model_capabilities as $model_id => $capabilities ) : ?>
 					<tr>
-						<td><code><?php echo esc_html( $model_id ); ?></code></td>
+						<td><code><?php echo esc_html( (string) $model_id ); ?></code></td>
+						<td><?php echo esc_html( $capabilities ); ?></td>
 						<td><?php echo esc_html( $descriptions[ $model_id ] ?? '' ); ?></td>
 					</tr>
 				<?php endforeach; ?>
@@ -379,6 +400,50 @@ class AmazeeIoSettings {
 		</table>
 
 		<?php
+	}
+
+	/**
+	 * Describes what a discovered model can be used for.
+	 *
+	 * Built from the capabilities and input types the endpoint reported for
+	 * the model, so the list always reflects the region's live catalog.
+	 *
+	 * @param ModelMetadata $model Model metadata from the model directory.
+	 * @return list<string>
+	 */
+	public static function capability_labels( ModelMetadata $model ): array {
+		$names = array(
+			'text_generation'           => __( 'Text', 'ai-provider-for-amazee-ai' ),
+			'image_generation'          => __( 'Image generation', 'ai-provider-for-amazee-ai' ),
+			'embedding_generation'      => __( 'Embeddings', 'ai-provider-for-amazee-ai' ),
+			'text_to_speech_conversion' => __( 'Text to speech', 'ai-provider-for-amazee-ai' ),
+		);
+
+		$labels = array();
+		foreach ( $model->getSupportedCapabilities() as $capability ) {
+			if ( isset( $names[ $capability->value ] ) ) {
+				$labels[] = $names[ $capability->value ];
+			}
+		}
+
+		$inputs = array();
+		foreach ( $model->getSupportedOptions() as $option ) {
+			if ( $option->getName()->isInputModalities() ) {
+				foreach ( (array) $option->getSupportedValues() as $combination ) {
+					foreach ( (array) $combination as $modality ) {
+						$inputs[ (string) $modality ] = true;
+					}
+				}
+			}
+		}
+		if ( isset( $inputs['image'] ) && in_array( $names['text_generation'], $labels, true ) ) {
+			$labels[] = __( 'Vision', 'ai-provider-for-amazee-ai' );
+		}
+		if ( isset( $inputs['audio'] ) ) {
+			$labels[] = __( 'Audio input', 'ai-provider-for-amazee-ai' );
+		}
+
+		return $labels;
 	}
 
 	/**

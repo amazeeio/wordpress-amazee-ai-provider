@@ -3,7 +3,7 @@ Contributors: dan2k3k4
 Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
 Tested up to: 7.1
-Stable tag: 1.4
+Stable tag: 1.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -36,7 +36,23 @@ Models are dynamically loaded from your active LiteLLM region endpoint.
 
 Supported in regions whose endpoint offers a model in `image_generation` mode. Such models are detected automatically from the model catalog, no configuration needed. Images are returned inline as base64 data.
 
-Modes other than chat and image generation (embeddings, audio, responses) are not exposed yet.
+= Embeddings =
+
+Models in `embedding` mode are exposed for embedding generation, used by the AI plugin's embedding sync and semantic features. Requires WordPress AI plugin 1.5+ (or php-ai-client 1.4+), which provides the embedding API.
+
+= Text to Speech =
+
+Models in `audio_speech` mode are exposed for text-to-speech conversion, used by the AI plugin's Text to Speech experiment. Audio is returned inline as MP3, Opus, WAV, FLAC or AAC.
+
+= Audio input =
+
+Chat models the endpoint reports with `supports_audio_input` accept audio files in prompts (sent inline as `input_audio`), which is how the AI client does speech to text, e.g. `AiClient::prompt( 'Transcribe this.' )->withFile( $audio )->generateText()`.
+
+= Automatic capability discovery =
+
+Everything above is discovered from the region's LiteLLM `model/info` catalog: each model's `mode` and `supports_*` flags decide which capabilities it is offered for, so a region that adds or removes embedding, speech or audio models needs no plugin change. Settings > amazee.ai lists every model with its capabilities. The catalog is cached per endpoint for 12 hours, so catalog changes show up within that time; `wp transient delete --all` refreshes it immediately.
+
+Other modes (audio transcription, responses) are not exposed yet.
 
 == External Services ==
 
@@ -95,6 +111,14 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 2. The Settings > amazee.ai screen: endpoint URL, connection status and the models available to your account.
 
 == Changelog ==
+
+= 1.5 =
+* Embedding generation: models the endpoint reports in `embedding` mode are exposed with the embedding generation capability (php-ai-client 1.4+ or the WordPress AI plugin 1.5 SDK overlay).
+* Text to speech: models in `audio_speech` mode are exposed with the text-to-speech capability, so the AI plugin's Text to Speech experiment turns itself on in regions that offer such a model.
+* Audio input: chat models reporting `supports_audio_input` accept audio files in prompts.
+* Security: the endpoint URL must use https, so the API key is never sent unencrypted. The settings screen refuses plain `http` URLs, and requests refuse them whichever way the URL was configured (constant, setting or credential).
+* Accessibility: connection status uses core notice styles (the green status text failed WCAG AA contrast), the endpoint URL field is linked to its description, and the my.amazee.io link announces that it opens in a new tab.
+* Settings > amazee.ai shows each model's capabilities (text, vision, audio input, image generation, embeddings, text to speech) as discovered from the endpoint.
 
 = 1.4 =
 * New Settings > amazee.ai screen for the endpoint URL, with a connection check listing the models available to your account.

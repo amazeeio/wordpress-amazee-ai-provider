@@ -3,7 +3,7 @@
  * Plugin Name: AI Provider for amazee.ai
  * Plugin URI: https://github.com/amazeeio/wordpress-amazee-ai-provider
  * Description: Adds amazee.ai AI hosting to the available AI providers
- * Version: 1.4
+ * Version: 1.5
  * Requires at least: 7.0
  * Requires PHP: 7.4
  * Author: amazee.ai
