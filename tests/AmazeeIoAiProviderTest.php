@@ -115,8 +115,8 @@ class AmazeeIoAiProviderTest extends TestCase {
 	}
 
 	public function testRequestsAcceptHttpsEndpoint() {
-		amazeeio_test_set_credential( 'HTTPS://llm.de-eu101.amazee.ai|test-token' );
+		amazeeio_test_set_credential( 'https://llm.de-eu101.amazee.ai|test-token' );
 
-		$this->assertSame( 'HTTPS://llm.de-eu101.amazee.ai/model/info', \Amazee\AiProvider\AmazeeIoAiProvider::url( 'model/info' ) );
+		$this->assertSame( 'https://llm.de-eu101.amazee.ai/model/info', \Amazee\AiProvider\AmazeeIoAiProvider::url( 'model/info' ) );
 	}
 }
