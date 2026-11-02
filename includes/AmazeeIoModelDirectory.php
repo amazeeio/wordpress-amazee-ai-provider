@@ -216,17 +216,23 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 			$options[] = new SupportedOption( OptionEnum::outputSchema() );
 		}
 
+		// Text plus every combination of the extra input types the model
+		// reports. Audio parts are sent inline as `input_audio`, which is how
+		// the AI client does speech to text.
+		$combinations = array( array( ModalityEnum::text() ) );
+		$extras       = array();
 		if ( ! empty( $meta['supports_vision'] ) ) {
-			$options[] = new SupportedOption(
-				OptionEnum::inputModalities(),
-				array(
-					array( ModalityEnum::text() ),
-					array( ModalityEnum::text(), ModalityEnum::image() ),
-				)
-			);
-		} else {
-			$options[] = new SupportedOption( OptionEnum::inputModalities(), array( array( ModalityEnum::text() ) ) );
+			$extras[] = ModalityEnum::image();
 		}
+		if ( ! empty( $meta['supports_audio_input'] ) ) {
+			$extras[] = ModalityEnum::audio();
+		}
+		foreach ( $extras as $extra ) {
+			foreach ( $combinations as $combination ) {
+				$combinations[] = array_merge( $combination, array( $extra ) );
+			}
+		}
+		$options[] = new SupportedOption( OptionEnum::inputModalities(), $combinations );
 		$options[] = new SupportedOption( OptionEnum::outputModalities(), array( array( ModalityEnum::text() ) ) );
 
 		return new ModelMetadata( $id, $id, $capabilities, $options );

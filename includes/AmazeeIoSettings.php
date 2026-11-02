@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Amazee\AiProvider;
 
+use WordPress\AiClient\Providers\Models\DTO\ModelMetadata;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -354,24 +356,26 @@ class AmazeeIoSettings {
 			}
 		}
 
-		$model_ids = array();
+		$model_capabilities = array();
 		foreach ( $models as $model ) {
-			$model_ids[] = $model->getId();
+			$model_capabilities[ $model->getId() ] = implode( ', ', self::capability_labels( $model ) );
 		}
-		sort( $model_ids );
+		ksort( $model_capabilities );
 		?>
 
 		<table class="widefat striped" style="max-width:800px;">
 			<thead>
 				<tr>
 					<th scope="col"><?php esc_html_e( 'Model', 'ai-provider-for-amazee-ai' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Capabilities', 'ai-provider-for-amazee-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Description', 'ai-provider-for-amazee-ai' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ( $model_ids as $model_id ) : ?>
+				<?php foreach ( $model_capabilities as $model_id => $capabilities ) : ?>
 					<tr>
-						<td><code><?php echo esc_html( $model_id ); ?></code></td>
+						<td><code><?php echo esc_html( (string) $model_id ); ?></code></td>
+						<td><?php echo esc_html( $capabilities ); ?></td>
 						<td><?php echo esc_html( $descriptions[ $model_id ] ?? '' ); ?></td>
 					</tr>
 				<?php endforeach; ?>
@@ -379,6 +383,50 @@ class AmazeeIoSettings {
 		</table>
 
 		<?php
+	}
+
+	/**
+	 * Describes what a discovered model can be used for.
+	 *
+	 * Built from the capabilities and input types the endpoint reported for
+	 * the model, so the list always reflects the region's live catalog.
+	 *
+	 * @param ModelMetadata $model Model metadata from the model directory.
+	 * @return list<string>
+	 */
+	public static function capability_labels( ModelMetadata $model ): array {
+		$names = array(
+			'text_generation'           => __( 'Text', 'ai-provider-for-amazee-ai' ),
+			'image_generation'          => __( 'Image generation', 'ai-provider-for-amazee-ai' ),
+			'embedding_generation'      => __( 'Embeddings', 'ai-provider-for-amazee-ai' ),
+			'text_to_speech_conversion' => __( 'Text to speech', 'ai-provider-for-amazee-ai' ),
+		);
+
+		$labels = array();
+		foreach ( $model->getSupportedCapabilities() as $capability ) {
+			if ( isset( $names[ $capability->value ] ) ) {
+				$labels[] = $names[ $capability->value ];
+			}
+		}
+
+		$inputs = array();
+		foreach ( $model->getSupportedOptions() as $option ) {
+			if ( $option->getName()->isInputModalities() ) {
+				foreach ( (array) $option->getSupportedValues() as $combination ) {
+					foreach ( (array) $combination as $modality ) {
+						$inputs[ (string) $modality ] = true;
+					}
+				}
+			}
+		}
+		if ( isset( $inputs['image'] ) && in_array( $names['text_generation'], $labels, true ) ) {
+			$labels[] = __( 'Vision', 'ai-provider-for-amazee-ai' );
+		}
+		if ( isset( $inputs['audio'] ) ) {
+			$labels[] = __( 'Audio input', 'ai-provider-for-amazee-ai' );
+		}
+
+		return $labels;
 	}
 
 	/**

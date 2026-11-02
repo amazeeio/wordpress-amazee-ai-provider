@@ -169,4 +169,41 @@ class AmazeeIoModelDirectoryTest extends TestCase {
 		$this->assertTrue( $options[ OptionEnum::outputFileType()->value ]->isSupportedValue( FileTypeEnum::inline() ) );
 		$this->assertTrue( $options[ OptionEnum::outputModalities()->value ]->isSupportedValue( array( ModalityEnum::image() ) ) );
 	}
+
+	public function testInputModalitiesFollowReportedFlags() {
+		$this->seedModelData(
+			array(
+				array( 'model_name' => 'plain', 'model_info' => array( 'mode' => 'chat' ) ),
+				array( 'model_name' => 'audio', 'model_info' => array( 'mode' => 'chat', 'supports_audio_input' => true ) ),
+				array(
+					'model_name' => 'omni',
+					'model_info' => array(
+						'mode'                 => 'chat',
+						'supports_vision'      => true,
+						'supports_audio_input' => true,
+					),
+				),
+			)
+		);
+
+		$list   = $this->listModelMetadataFromCache();
+		$inputs = function ( string $id ) use ( $list ) {
+			foreach ( $list[ $id ]->getSupportedOptions() as $option ) {
+				if ( $option->getName()->isInputModalities() ) {
+					return $option;
+				}
+			}
+			$this->fail( "No input modalities for $id" );
+		};
+
+		$text  = ModalityEnum::text();
+		$image = ModalityEnum::image();
+		$audio = ModalityEnum::audio();
+
+		$this->assertFalse( $inputs( 'plain' )->isSupportedValue( array( $text, $audio ) ) );
+		$this->assertTrue( $inputs( 'audio' )->isSupportedValue( array( $text, $audio ) ) );
+		$this->assertFalse( $inputs( 'audio' )->isSupportedValue( array( $text, $image ) ) );
+		$this->assertTrue( $inputs( 'omni' )->isSupportedValue( array( $text, $image, $audio ) ) );
+		$this->assertTrue( $inputs( 'omni' )->isSupportedValue( array( $text, $audio ) ) );
+	}
 }

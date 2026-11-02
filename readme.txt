@@ -44,6 +44,14 @@ Models in `embedding` mode are exposed for embedding generation, used by the AI 
 
 Models in `audio_speech` mode are exposed for text-to-speech conversion, used by the AI plugin's Text to Speech experiment. Audio is returned inline as MP3, Opus, WAV, FLAC or AAC.
 
+= Audio input =
+
+Chat models the endpoint reports with `supports_audio_input` accept audio files in prompts (sent inline as `input_audio`), which is how the AI client does speech to text, e.g. `AiClient::prompt( 'Transcribe this.' )->withFile( $audio )->generateText()`.
+
+= Automatic capability discovery =
+
+Everything above is discovered from the region's LiteLLM `model/info` catalog: each model's `mode` and `supports_*` flags decide which capabilities it is offered for, so a region that adds or removes embedding, speech or audio models needs no plugin change. Settings > amazee.ai lists every model with its capabilities. The catalog is cached per endpoint for 12 hours, so catalog changes show up within that time; `wp transient delete --all` refreshes it immediately.
+
 Other modes (audio transcription, responses) are not exposed yet.
 
 == External Services ==
@@ -107,6 +115,8 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 = 1.5 =
 * Embedding generation: models the endpoint reports in `embedding` mode are exposed with the embedding generation capability (php-ai-client 1.4+ or the WordPress AI plugin 1.5 SDK overlay).
 * Text to speech: models in `audio_speech` mode are exposed with the text-to-speech capability, so the AI plugin's Text to Speech experiment turns itself on in regions that offer such a model.
+* Audio input: chat models reporting `supports_audio_input` accept audio files in prompts.
+* Settings > amazee.ai shows each model's capabilities (text, vision, audio input, image generation, embeddings, text to speech) as discovered from the endpoint.
 
 = 1.4 =
 * New Settings > amazee.ai screen for the endpoint URL, with a connection check listing the models available to your account.
