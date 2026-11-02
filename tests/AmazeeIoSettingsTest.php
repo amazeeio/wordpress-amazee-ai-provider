@@ -93,4 +93,13 @@ class AmazeeIoSettingsTest extends TestCase {
 			$labels
 		);
 	}
+
+	public function testSanitizeRejectsPlainHttpAndKeepsPreviousUrl() {
+		$GLOBALS['wp_mock_options']['ai_provider_for_amazee_ai_settings'] = array( 'endpoint_url' => 'https://llm.us103.amazee.ai' );
+
+		$result = ( new AmazeeIoSettings() )->sanitize_settings( array( 'endpoint_url' => 'http://llm.de-eu101.amazee.ai' ) );
+
+		$this->assertSame( 'https://llm.us103.amazee.ai', $result['endpoint_url'] );
+		$this->assertSame( 'amazee_endpoint_url_insecure', $GLOBALS['wp_mock_settings_errors'][0]['code'] );
+	}
 }

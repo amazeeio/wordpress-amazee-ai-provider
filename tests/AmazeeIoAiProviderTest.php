@@ -105,4 +105,18 @@ class AmazeeIoAiProviderTest extends TestCase {
 		$this->assertInstanceOf( ApiKeyRequestAuthentication::class, $auth );
 		$this->assertEquals( 'fallback-token', $auth->getApiKey() );
 	}
+
+	public function testRequestsRefusePlainHttpEndpoint() {
+		amazeeio_test_set_credential( 'http://llm.de-eu101.amazee.ai/v1|test-token' );
+
+		$this->expectException( \WordPress\AiClient\Common\Exception\RuntimeException::class );
+		$this->expectExceptionMessageMatches( '/https/' );
+		\Amazee\AiProvider\AmazeeIoAiProvider::url( 'model/info' );
+	}
+
+	public function testRequestsAcceptHttpsEndpoint() {
+		amazeeio_test_set_credential( 'HTTPS://llm.de-eu101.amazee.ai|test-token' );
+
+		$this->assertSame( 'HTTPS://llm.de-eu101.amazee.ai/model/info', \Amazee\AiProvider\AmazeeIoAiProvider::url( 'model/info' ) );
+	}
 }

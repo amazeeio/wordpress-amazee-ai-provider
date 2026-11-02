@@ -116,6 +116,8 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 * Embedding generation: models the endpoint reports in `embedding` mode are exposed with the embedding generation capability (php-ai-client 1.4+ or the WordPress AI plugin 1.5 SDK overlay).
 * Text to speech: models in `audio_speech` mode are exposed with the text-to-speech capability, so the AI plugin's Text to Speech experiment turns itself on in regions that offer such a model.
 * Audio input: chat models reporting `supports_audio_input` accept audio files in prompts.
+* Security: the endpoint URL must use https, so the API key is never sent unencrypted. The settings screen refuses plain `http` URLs, and requests refuse them whichever way the URL was configured (constant, setting or credential).
+* Accessibility: connection status uses core notice styles (the green status text failed WCAG AA contrast), the endpoint URL field is linked to its description, and the my.amazee.io link announces that it opens in a new tab.
 * Settings > amazee.ai shows each model's capabilities (text, vision, audio input, image generation, embeddings, text to speech) as discovered from the endpoint.
 
 = 1.4 =

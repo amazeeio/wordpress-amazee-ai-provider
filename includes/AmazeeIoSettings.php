@@ -157,6 +157,19 @@ class AmazeeIoSettings {
 			$endpoint_url = rtrim( esc_url_raw( $endpoint_url ), '/' );
 		}
 
+		// The API key is sent with every request, so never store a URL that
+		// would send it unencrypted; keep the previous value instead.
+		if ( '' !== $endpoint_url && ! AmazeeIoAiProvider::isHttpsUrl( $endpoint_url ) ) {
+			if ( function_exists( 'add_settings_error' ) ) {
+				add_settings_error(
+					self::OPTION_NAME,
+					'amazee_endpoint_url_insecure',
+					__( 'The endpoint URL must start with https:// so your API key is never sent unencrypted. The previous URL was kept.', 'ai-provider-for-amazee-ai' )
+				);
+			}
+			return array( 'endpoint_url' => self::get_endpoint_url() );
+		}
+
 		// Tokens are bound to the region endpoint they were issued for, so a
 		// changed URL almost always needs a new token as well. The function
 		// guard keeps non-admin contexts (wp-cli, front end) from fataling,
@@ -198,7 +211,7 @@ class AmazeeIoSettings {
 					/* translators: 1: opening link tag to my.amazee.io, 2: closing link tag */
 					esc_html__( 'amazee.ai credentials are managed in the amazee.io dashboard: copy the endpoint URL and API key for your region from %1$smy.amazee.io%2$s.', 'ai-provider-for-amazee-ai' ),
 					'<a href="https://my.amazee.io" target="_blank" rel="noopener">',
-					'</a>'
+					'<span class="screen-reader-text"> ' . esc_html__( '(opens in a new tab)', 'ai-provider-for-amazee-ai' ) . '</span></a>'
 				);
 				?>
 			</p>
@@ -249,10 +262,12 @@ class AmazeeIoSettings {
 			value="<?php echo esc_attr( $constant_set ? $constant_url : self::get_endpoint_url() ); ?>"
 			class="regular-text"
 			placeholder="https://llm.&lt;region&gt;.amazee.ai"
+			pattern="[Hh][Tt][Tt][Pp][Ss]://.+"
+			aria-describedby="<?php echo esc_attr( self::OPTION_NAME . '-endpoint-url-description' ); ?>"
 			required
 			<?php disabled( $constant_set ); ?>
 		/>
-		<p class="description">
+		<p class="description" id="<?php echo esc_attr( self::OPTION_NAME . '-endpoint-url-description' ); ?>">
 			<?php
 			if ( $constant_set ) {
 				printf(
@@ -319,7 +334,7 @@ class AmazeeIoSettings {
 			$models = AmazeeIoAiProvider::modelMetadataDirectory()->listModelMetadata();
 		} catch ( \Throwable $exception ) {
 			printf(
-				'<p style="color:#d63638;">%s</p>',
+				'<div class="notice notice-error inline"><p>%s</p></div>',
 				sprintf(
 					/* translators: %s: error message returned by the API */
 					esc_html__( 'Could not connect: %s', 'ai-provider-for-amazee-ai' ),
@@ -329,8 +344,10 @@ class AmazeeIoSettings {
 			return;
 		}
 
+		// Core notice styles instead of coloured text: the old green
+		// (#00a32a on white) failed WCAG AA contrast for body text.
 		printf(
-			'<p style="color:#00a32a;">%s</p>',
+			'<div class="notice notice-success inline"><p>%s</p></div>',
 			esc_html(
 				sprintf(
 					/* translators: %d: number of models */
