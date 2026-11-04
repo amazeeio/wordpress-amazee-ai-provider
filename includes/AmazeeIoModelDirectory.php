@@ -88,7 +88,8 @@ class AmazeeIoModelDirectory extends AbstractOpenAiCompatibleModelMetadataDirect
 			$method,
 			AmazeeIoAiProvider::url( $path ),
 			$headers,
-			$data
+			$data,
+			AmazeeIoAiProvider::requestOptions()
 		);
 	}
 

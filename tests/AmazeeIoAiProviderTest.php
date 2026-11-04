@@ -114,6 +114,27 @@ class AmazeeIoAiProviderTest extends TestCase {
 		\Amazee\AiProvider\AmazeeIoAiProvider::url( 'model/info' );
 	}
 
+	public function testModelsAndDiscoveryUseTheDefaultTimeout() {
+		amazeeio_test_set_credential( 'https://llm.de-eu101.amazee.ai|test-token' );
+
+		$create_model = new \ReflectionMethod( AmazeeIoAiProvider::class, 'createModel' );
+		$model = $create_model->invoke(
+			null,
+			new \WordPress\AiClient\Providers\Models\DTO\ModelMetadata(
+				'chat',
+				'chat',
+				array( \WordPress\AiClient\Providers\Models\Enums\CapabilityEnum::textGeneration() ),
+				array()
+			),
+			AmazeeIoAiProvider::metadata()
+		);
+		$this->assertSame( AmazeeIoAiProvider::REQUEST_TIMEOUT, $model->getRequestOptions()->getTimeout() );
+
+		$create_request = new \ReflectionMethod( AmazeeIoModelDirectory::class, 'createRequest' );
+		$request = $create_request->invoke( new AmazeeIoModelDirectory(), \WordPress\AiClient\Providers\Http\Enums\HttpMethodEnum::GET(), 'model/info' );
+		$this->assertSame( AmazeeIoAiProvider::REQUEST_TIMEOUT, $request->getOptions()->getTimeout() );
+	}
+
 	public function testRequestsAcceptHttpsEndpoint() {
 		amazeeio_test_set_credential( 'https://llm.de-eu101.amazee.ai|test-token' );
 

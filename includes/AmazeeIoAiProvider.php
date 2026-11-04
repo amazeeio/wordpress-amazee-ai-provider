@@ -11,6 +11,7 @@ namespace Amazee\AiProvider;
 
 use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Common\Exception\RuntimeException;
+use WordPress\AiClient\Providers\Http\DTO\RequestOptions;
 use WordPress\AiClient\Providers\Http\DTO\Response;
 use WordPress\AiClient\Providers\Http\Exception\ClientException;
 use WordPress\AiClient\Providers\ApiBasedImplementation\AbstractApiProvider;
@@ -35,7 +36,27 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	 *
 	 * Must be kept in sync with the version in the main plugin file.
 	 */
-	public const VERSION = '1.5';
+	public const VERSION = '1.5.1';
+
+	/**
+	 * Default HTTP timeout for API requests, in seconds.
+	 *
+	 * Matches the default core's `wp_ai_client_prompt()` applies. Without it,
+	 * direct AI client usage and model discovery fall back to WordPress's 5
+	 * second HTTP default, which image generation already exceeds. Requests
+	 * made through core's prompt builder keep their own timeout (filterable
+	 * via `wp_ai_client_default_request_timeout`), as it overrides this one.
+	 */
+	public const REQUEST_TIMEOUT = 30.0;
+
+	/**
+	 * Request options applied to every amazee.ai API request.
+	 */
+	public static function requestOptions(): RequestOptions {
+		$options = new RequestOptions();
+		$options->setTimeout( self::REQUEST_TIMEOUT );
+		return $options;
+	}
 
 	/**
 	 * Value of the `X-Amazee-Client` header sent with every API request.
@@ -221,17 +242,20 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	): ModelInterface {
 		$caps = $model_metadata->getSupportedCapabilities();
 		foreach ( $caps as $cap ) {
+			$model = null;
 			if ( $cap->isTextGeneration() ) {
-				return new AmazeeIoTextModel( $model_metadata, $provider_metadata );
+				$model = new AmazeeIoTextModel( $model_metadata, $provider_metadata );
+			} elseif ( $cap->isImageGeneration() ) {
+				$model = new AmazeeIoImageModel( $model_metadata, $provider_metadata );
+			} elseif ( $cap->isEmbeddingGeneration() ) {
+				$model = new AmazeeIoEmbeddingModel( $model_metadata, $provider_metadata );
+			} elseif ( $cap->isTextToSpeechConversion() ) {
+				$model = new AmazeeIoSpeechModel( $model_metadata, $provider_metadata );
 			}
-			if ( $cap->isImageGeneration() ) {
-				return new AmazeeIoImageModel( $model_metadata, $provider_metadata );
-			}
-			if ( $cap->isEmbeddingGeneration() ) {
-				return new AmazeeIoEmbeddingModel( $model_metadata, $provider_metadata );
-			}
-			if ( $cap->isTextToSpeechConversion() ) {
-				return new AmazeeIoSpeechModel( $model_metadata, $provider_metadata );
+
+			if ( null !== $model ) {
+				$model->setRequestOptions( self::requestOptions() );
+				return $model;
 			}
 		}
 
