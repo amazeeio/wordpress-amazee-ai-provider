@@ -3,7 +3,7 @@ Contributors: dan2k3k4
 Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
 Tested up to: 7.1
-Stable tag: 1.5
+Stable tag: 1.5.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -111,6 +111,9 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 2. The Settings > amazee.ai screen: endpoint URL, connection status and the models available to your account.
 
 == Changelog ==
+
+= 1.5.1 =
+* Requests to your amazee.ai region endpoint now use a 30 second timeout instead of the 5 second WordPress default, so model discovery and direct AI client calls (e.g. image generation) no longer time out early. Requests made through WordPress core's AI features keep core's own timeout.
 
 = 1.5 =
 * Embedding generation: models the endpoint reports in `embedding` mode are exposed with the embedding generation capability (php-ai-client 1.4+ or the WordPress AI plugin 1.5 SDK overlay).
