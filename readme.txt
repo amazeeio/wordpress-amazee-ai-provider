@@ -113,7 +113,7 @@ Released versions bundle their own autoloader, so there is no build step. Only i
 == Changelog ==
 
 = 1.5.1 =
-* Requests to amazee.ai now use a 30 second timeout instead of the 5 second WordPress default, so model discovery and direct AI client calls (e.g. image generation) no longer time out early. Requests made through WordPress core's AI features keep core's own timeout.
+* Requests to your amazee.ai region endpoint now use a 30 second timeout instead of the 5 second WordPress default, so model discovery and direct AI client calls (e.g. image generation) no longer time out early. Requests made through WordPress core's AI features keep core's own timeout.
 
 = 1.5 =
 * Embedding generation: models the endpoint reports in `embedding` mode are exposed with the embedding generation capability (php-ai-client 1.4+ or the WordPress AI plugin 1.5 SDK overlay).

@@ -50,7 +50,7 @@ class AmazeeIoAiProvider extends AbstractApiProvider {
 	public const REQUEST_TIMEOUT = 30.0;
 
 	/**
-	 * Request options applied to every amazee.ai API request.
+	 * Request options applied to every request to the region endpoint.
 	 */
 	public static function requestOptions(): RequestOptions {
 		$options = new RequestOptions();
