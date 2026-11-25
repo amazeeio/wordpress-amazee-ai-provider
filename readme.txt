@@ -2,7 +2,7 @@
 Contributors: dan2k3k4
 Tags: AI, llm, gpt, artificial-intelligence, connector
 Requires at least: 7.0
-Tested up to: 7.1
+Tested up to: 7.2
 Stable tag: 1.5.1
 Requires PHP: 7.4
 License: GPLv2 or later
